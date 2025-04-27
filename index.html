@@ -7,21 +7,23 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>🏭 Warehouse Section Locator</h1>
+  <div class="main-container">
+    <h1>Inventory Locator 📦</h1>
 
-    <div class="search-wrapper">
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input id="searchBox" type="text" placeholder="Search Item(s)" />
+    <div class="card">
+      <div class="search-wrapper">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input id="searchBox" type="text" placeholder="Search SKU or Item..." />
+        </div>
+        <small class="hint">Tip: Separate multiple items with commas</small>
       </div>
-      <small class="hint">Tip: Separate multiple items with commas (,)</small>
-    </div>
 
-    <div id="result"></div>
+      <div id="result"></div>
 
-    <div class="map-wrapper">
-      <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
+      <div class="map-wrapper">
+        <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
+      </div>
     </div>
   </div>
 
