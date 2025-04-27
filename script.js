@@ -93,7 +93,7 @@ async function searchItems() {
       let highlightId = "";
 
       if (level && block && side && section) {
-        highlightId = `${aisle}-${level}-${block.replace(/\s/g, '')}-${side}-${section}`;
+        highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
         const el = document.getElementById(highlightId);
         if (el) el.classList.add("highlight");
       } else if (aisle) {
