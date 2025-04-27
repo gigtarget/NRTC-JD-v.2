@@ -2,31 +2,114 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory Locator 📦</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warehouse Section Locator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      padding-right: 30px;
+    }
+
+    #clearBtn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+      font-size: 18px;
+      display: none;
+    }
+
+    #result {
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e7d32;
+      white-space: pre-line;
+    }
+
+    .map-wrapper {
+      overflow-x: auto;
+      padding: 10px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    svg {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 530px;
+      width: 100%;
+      height: auto;
+    }
+
+    .section {
+      fill: white;
+      stroke: red;
+      stroke-width: 0.6;
+    }
+
+    .highlight {
+      fill: yellow !important;
+      stroke: black;
+      stroke-width: 1.5;
+    }
+
+    .aisle-label {
+      font-size: 11px;
+      font-weight: bold;
+      fill: #333;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 22px;
+      }
+      #result {
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <h1>🏭 Warehouse Section Locator</h1>
+  <p>Enter Item Code:</p>
+  <div class="input-wrapper">
+    <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
+    <span id="clearBtn">❌</span>
+  </div>
+  <div id="result"></div>
 
-  <div class="main-container">
-    <h1>Inventory Locator 📦</h1>
-
-    <div class="card">
-      <div class="search-wrapper">
-        <div class="search-bar">
-          <span class="search-icon">🔍</span>
-          <input id="searchBox" type="text" placeholder="Search SKU or Item..." />
-          <span id="clearBtn" class="clear-icon" style="display:none;">❌</span>
-        </div>
-        <small class="hint">Tip: Separate multiple items with commas</small>
-      </div>
-
-      <div id="result"></div>
-
-      <div class="map-wrapper">
-        <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
-      </div>
-    </div>
+  <div class="map-wrapper">
+    <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
   </div>
 
   <script src="script.js"></script>
