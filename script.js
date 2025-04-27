@@ -126,12 +126,27 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
-// Handle feedback form submit -> Show Thank You
+// 🚀 Feedback Form Submission: prevent page reload, show Thank You
 document.getElementById("feedbackForm").addEventListener("submit", function(event) {
-  setTimeout(() => {
-    document.getElementById("feedbackForm").style.display = "none";
-    document.getElementById("thankYouMessage").style.display = "block";
-  }, 1000);
+  event.preventDefault(); // Stop page reload
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  fetch(form.action, {
+    method: "POST",
+    body: formData,
+    headers: { 'Accept': 'application/json' }
+  }).then(response => {
+    if (response.ok) {
+      form.style.display = "none";
+      document.getElementById("thankYouMessage").style.display = "block";
+    } else {
+      alert("⚠️ There was an error submitting your feedback. Please try again.");
+    }
+  }).catch(error => {
+    alert("⚠️ Network error. Please check your connection.");
+  });
 });
 
 drawSections();
