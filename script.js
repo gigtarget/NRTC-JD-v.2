@@ -21,6 +21,8 @@ const dynamicViewBoxWidth = totalAisles * aisleSpacing;
 svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
 
 function drawSections() {
+  svg.innerHTML = ""; // Reset SVG before drawing again
+
   let index = 0;
   for (let aisle in aisleConfig) {
     const { front, back } = aisleConfig[aisle];
@@ -34,7 +36,7 @@ function drawSections() {
     label.textContent = aisle;
     svg.appendChild(label);
 
-    // FRONT
+    // FRONT Sections
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -48,7 +50,7 @@ function drawSections() {
       });
     }
 
-    // BACK
+    // BACK Sections
     for (let i = 0; i < back; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -71,47 +73,52 @@ function clearHighlights() {
 }
 
 async function searchItems(codes) {
-  const response = await fetch("warehouse_inventory_map.csv");
-  const text = await response.text();
-  const rows = text.split("\n").slice(1);
-  const data = rows.map(row => {
-    const [code, aisle, level, block, side, section] = row.split(",").map(s => s.trim());
-    return { code, aisle, level, block, side, section };
-  });
+  try {
+    const response = await fetch("warehouse_inventory_map.csv");
+    const text = await response.text();
+    const rows = text.split("\n").slice(1);
+    const data = rows.map(row => {
+      const [code, aisle, level, block, side, section] = row.split(",").map(s => s.trim());
+      return { code, aisle, level, block, side, section };
+    });
 
-  clearHighlights();
-  const resultBox = document.getElementById("result");
-  let foundItems = [];
-  let notFoundItems = [];
+    clearHighlights();
+    const resultBox = document.getElementById("result");
+    let foundItems = [];
+    let notFoundItems = [];
 
-  codes.forEach(code => {
-    const match = data.find(r => r.code === code);
-    if (match) {
-      const { aisle, level, block, side, section } = match;
-      let highlightId = "";
+    codes.forEach(code => {
+      const match = data.find(r => r.code === code);
+      if (match) {
+        const { aisle, level, block, side, section } = match;
+        let highlightId = "";
 
-      if (level && block && side && section) {
-        highlightId = `${aisle}-${level}-${block.replace(/\s/g, '')}-${side}-${section}`;
+        if (level && block && side && section) {
+          highlightId = `${aisle}-${level}-${block.replace(/\s/g, '')}-${side}-${section}`;
+        } else {
+          highlightId = null;
+          document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
+        }
+
+        if (highlightId) {
+          const el = document.getElementById(highlightId);
+          if (el) el.classList.add("highlight");
+        }
+
+        foundItems.push(code);
       } else {
-        highlightId = null;
-        document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
+        notFoundItems.push(code);
       }
+    });
 
-      if (highlightId) {
-        const el = document.getElementById(highlightId);
-        if (el) el.classList.add("highlight");
-      }
-
-      foundItems.push(code);
-    } else {
-      notFoundItems.push(code);
-    }
-  });
-
-  resultBox.innerHTML = `
-    ✅ Found: ${foundItems.join(", ")} <br>
-    ${notFoundItems.length ? `⚠️ Not Found: ${notFoundItems.join(", ")}` : ''}
-  `;
+    resultBox.innerHTML = `
+      <div style="color:green;">✅ Found: ${foundItems.join(", ")}</div>
+      ${notFoundItems.length ? `<div style="color:orange;">⚠️ Not Found: ${notFoundItems.join(", ")}</div>` : ''}
+    `;
+  } catch (error) {
+    console.error("Error loading CSV:", error);
+    document.getElementById("result").innerHTML = "⚠️ Error loading data.";
+  }
 }
 
 document.getElementById("searchBox").addEventListener("input", () => {
@@ -125,4 +132,5 @@ document.getElementById("searchBox").addEventListener("input", () => {
   }
 });
 
+// Draw warehouse initially
 drawSections();
