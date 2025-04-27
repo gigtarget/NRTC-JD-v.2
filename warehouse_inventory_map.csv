@@ -1,0 +1,85 @@
+Item Code,Aisle,Level,Block,Side,Section
+AHD,A,Top,Before Walkway,Right,1
+ZASJ,B,Top,,,
+KHS,B,Top,Before Walkway,Left,2
+KCN,B,Top,After Walkway,Left,8
+YCN,B,Top,After Walkway,Left,11
+ZA3CH (xxl only),B,Bottom,,,
+YHD,B,Bottom,Before Walkway,Left,2
+ACN,B,Bottom,After Walkway,Left,12
+AGDT,B,Top,Before Walkway,Right,2
+ASJ,B,Top,Before Walkway,Right,4
+LSJ,B,Top,After Walkway,Right,4
+YHZ,B,Top,After Walkway,Right,7
+KHZ,B,Top,After Walkway,Right,9
+ZA3CH,B,Bottom,Before Walkway,Right,1
+AGDH,B,Bottom,Before Walkway,Right,2
+AFZH,B,Bottom,After Walkway,Right,5
+AHZ,B,Bottom,After Walkway,Right,9
+LTT,C,Top,After Walkway,Left,4
+LST,C,Top,After Walkway,Left,5
+ARNH,C,Bottom,BEfore Walkway,Left,2
+ANH,C,Bottom,After Walkway,Left,5
+ANC,C,Bottom,After Walkway,Left,7
+LCQ,D,Top,After Walkway,Left,12
+LVT,D,Top,,,
+ABFZ,D,Bottom,After Walkway,Right,11
+ZYCBJ,D,Bottom,After Walkway,Left,10
+YFJH,D,Top,Before Walkway,Right,4
+AFJH,D,Top,After Walkway,Right,6
+AMGS,D,Top,After Walkway,Right,9
+LFTJ,D,Top,After Walkway,Right,8
+AOC,D,Bottom,After Walkway,Right,5
+AOH,D,Bottom,After Walkway,Right,7
+ASAH,D,Bottom,After Walkway,Right,10
+AQZ,D,Top,After Walkway,Right,10
+ZAVLJ,D,Bottom,After Walkway,Left,11
+LTT,E,Top,,,
+ATT,E,Top,,,
+ARST,E,Top,,,
+KSP,E,Top,,,
+ARNH,E,Bottom,,,
+ANQ,E,Bottom,,,
+AJH,E,Bottom,,,
+AJP,E,Bottom,,,
+KTS,E,Top,After Walkway,Left,10
+LMT,E,Top,After Walkway,Left,12
+ATS,E,Bottom,Before Walkway,Left,1
+ALS,E,Bottom,After Walkway,Left,12
+ACH,F,Top,,,
+ACT,F,Top,,,
+LCQ,F,Top,,,
+ACC,F,Bottom,,,
+ZAVLS,F,Bottom,,,
+ZACBJ,F,Bottom,,,
+KFJH,G,Top,,,
+LSOH,G,Bottom,,,
+ABFZ,G,Bottom,,,
+YTS,H,Top,,,
+YHTS,H,Top,,,
+LCC,I,Top,,,
+APQ,I,Top,,,
+APS,I,Top,,,
+YPS,I,Top,,,
+KPS,I,Top,,,
+KPH,I,Top,,,
+YPH,I,Top,,,
+PHD,I,Top,,,
+IZE,I,Top,,,
+ITS,I,Top,,,
+ATH,I,Bottom,,,
+LRNH,I,Bottom,,,
+AQHS,I,Bottom,,,
+APH,I,Bottom,,,
+AGDQ,I,Bottom,,,
+AWT,J,Top,,,
+AFTS,J,Top,,,
+ALWH,J,Top,,,
+YLWH,J,Top,,,
+KLWH,J,Top,,,
+LSS,J,Top,,,
+ASTH,J,Top,,,
+AWH,J,Bottom,,,
+ACW,J,Bottom,,,
+LHNS,J,Bottom,,,
+AHNH,J,Bottom,,,
