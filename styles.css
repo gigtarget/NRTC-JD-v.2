@@ -17,34 +17,20 @@ h1 {
   margin-bottom: 10px;
 }
 
-.mode-selector {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.mode-selector button {
-  padding: 10px 20px;
-  border: none;
-  background: #ccc;
-  margin: 0 5px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.mode-selector .active {
-  background: #2e7d32;
-  color: white;
-}
-
-.search-section input,
-.search-section textarea {
+.search-section input {
   width: 100%;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.hint {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  color: #555;
   margin-bottom: 10px;
 }
 
