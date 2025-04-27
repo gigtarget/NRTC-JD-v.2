@@ -13,9 +13,28 @@
       background: #f4f4f4;
     }
 
-    h1 {
-      font-size: 28px;
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
       margin-bottom: 10px;
+    }
+
+    .header img {
+      width: 70px;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .header-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    p {
+      margin: 5px 0 15px;
     }
 
     .input-wrapper {
@@ -90,22 +109,29 @@
     }
 
     @media (max-width: 600px) {
-      h1 {
-        font-size: 22px;
+      .header-title {
+        font-size: 20px;
       }
-      #result {
-        font-size: 14px;
+      input[type="text"] {
+        width: 90%;
       }
     }
   </style>
 </head>
 <body>
-  <h1>🏭 Warehouse Article Locator</h1>
+
+  <div class="header">
+    <img src="your-logo.png" alt="Logo" />
+    <div class="header-title">Warehouse<br>Article Locator</div>
+  </div>
+
   <p>Enter Item Code:</p>
+
   <div class="input-wrapper">
     <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
     <span id="clearBtn">❌</span>
   </div>
+
   <div id="result"></div>
 
   <div class="map-wrapper">
@@ -113,5 +139,6 @@
   </div>
 
   <script src="script.js"></script>
+
 </body>
 </html>
