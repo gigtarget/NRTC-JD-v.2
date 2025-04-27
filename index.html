@@ -136,12 +136,6 @@
       background-color: #27632a;
     }
 
-    #feedbackMessage {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #2e7d32;
-    }
-
     @media (max-width: 600px) {
       .header-title {
         font-size: 20px;
@@ -172,11 +166,17 @@
     <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
   </div>
 
+  <!-- Feedback Form Section -->
   <div class="feedback-section">
     <h3>📢 Suggest a Change / Request New Stock</h3>
-    <textarea id="feedbackInput" placeholder="Write your feedback or request here..."></textarea><br>
-    <button id="submitFeedback">Submit Feedback</button>
-    <p id="feedbackMessage"></p>
+    <form action="https://formsubmit.co/jatindhiman1991@hotmail.com" method="POST">
+      <textarea name="message" placeholder="Write your feedback here..." required></textarea><br>
+      
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="about:blank">
+      
+      <button type="submit">Submit Feedback</button>
+    </form>
   </div>
 
   <script src="script.js"></script>
