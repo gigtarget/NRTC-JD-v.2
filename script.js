@@ -20,8 +20,6 @@ const totalAisles = Object.keys(aisleConfig).length;
 const dynamicViewBoxWidth = totalAisles * aisleSpacing;
 svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
 
-let searchMode = "single"; // single | multiple
-
 function drawSections() {
   let index = 0;
   for (let aisle in aisleConfig) {
@@ -112,47 +110,19 @@ async function searchItems(codes) {
 
   resultBox.innerHTML = `
     ✅ Found: ${foundItems.join(", ")} <br>
-    ⚠️ Not Found: ${notFoundItems.join(", ")}
+    ${notFoundItems.length ? `⚠️ Not Found: ${notFoundItems.join(", ")}` : ''}
   `;
 }
 
 document.getElementById("searchBox").addEventListener("input", () => {
-  if (searchMode === "single") {
-    const query = document.getElementById("searchBox").value.trim().toUpperCase();
-    if (query.length > 0) {
-      searchItems([query]);
-    }
+  const query = document.getElementById("searchBox").value.trim().toUpperCase();
+  const codes = query.split(",").map(code => code.trim()).filter(Boolean);
+  if (codes.length > 0) {
+    searchItems(codes);
+  } else {
+    clearHighlights();
+    document.getElementById("result").innerHTML = "";
   }
-});
-
-document.getElementById("multiSearchBox").addEventListener("input", () => {
-  if (searchMode === "multiple") {
-    const query = document.getElementById("multiSearchBox").value.trim().toUpperCase();
-    const codes = query.split(",").map(code => code.trim()).filter(Boolean);
-    if (codes.length > 0) {
-      searchItems(codes);
-    }
-  }
-});
-
-document.getElementById("singleMode").addEventListener("click", () => {
-  searchMode = "single";
-  document.getElementById("singleMode").classList.add("active");
-  document.getElementById("multipleMode").classList.remove("active");
-  document.getElementById("searchBox").style.display = "block";
-  document.getElementById("multiSearchBox").style.display = "none";
-  document.getElementById("result").innerHTML = "";
-  clearHighlights();
-});
-
-document.getElementById("multipleMode").addEventListener("click", () => {
-  searchMode = "multiple";
-  document.getElementById("multipleMode").classList.add("active");
-  document.getElementById("singleMode").classList.remove("active");
-  document.getElementById("searchBox").style.display = "none";
-  document.getElementById("multiSearchBox").style.display = "block";
-  document.getElementById("result").innerHTML = "";
-  clearHighlights();
 });
 
 drawSections();
