@@ -15,7 +15,6 @@ const sectionSize = 20;
 const padding = 2;
 const offsetX = 10;
 const svg = document.getElementById("aisles");
-
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
@@ -25,7 +24,6 @@ svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
 
 function drawSections() {
   svg.innerHTML = "";
-
   let index = 0;
   for (let aisle in aisleConfig) {
     const { front, back } = aisleConfig[aisle];
@@ -102,33 +100,19 @@ async function searchItems() {
         document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
       }
 
-      const card = document.createElement('div');
-      card.className = 'result-card found';
-      card.innerHTML = `
-        ✅ Found: <b>${query}</b><br>
-        📍 Aisle: ${aisle || "-"}<br>
-        📏 Level: ${level || "-"}<br>
-        🧱 Block: ${block || "-"}<br>
-        🔄 Side: ${side || "-"}
-      `;
-      resultBox.appendChild(card);
-
+      resultBox.innerHTML += `✅ ${query}\nAisle: ${aisle}\nLevel: ${level}\nBlock: ${block}\nSide: ${side}\n\n`;
     } else {
-      const card = document.createElement('div');
-      card.className = 'result-card notfound';
-      card.textContent = `⚠️ Item not found: ${query}`;
-      resultBox.appendChild(card);
+      resultBox.innerHTML += `⚠️ ${query} - Item not found\n\n`;
     }
   });
 }
 
-// Show clear ❌ button dynamically
+// Input behavior
 searchBox.addEventListener("input", () => {
   const value = searchBox.value.trim();
   clearBtn.style.display = value.length > 0 ? "inline" : "none";
 
-  const codes = value.toUpperCase().split(",").map(code => code.trim()).filter(Boolean);
-  if (codes.length > 0) {
+  if (value.length > 0) {
     searchItems();
   } else {
     clearHighlights();
@@ -136,7 +120,7 @@ searchBox.addEventListener("input", () => {
   }
 });
 
-// Clear button functionality
+// Clear button
 clearBtn.addEventListener("click", () => {
   searchBox.value = "";
   clearBtn.style.display = "none";
