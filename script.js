@@ -126,4 +126,12 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
+// Handle feedback form submit -> Show Thank You
+document.getElementById("feedbackForm").addEventListener("submit", function(event) {
+  setTimeout(() => {
+    document.getElementById("feedbackForm").style.display = "none";
+    document.getElementById("thankYouMessage").style.display = "block";
+  }, 1000);
+});
+
 drawSections();
