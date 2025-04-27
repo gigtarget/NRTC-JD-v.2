@@ -20,6 +20,7 @@ const totalAisles = Object.keys(aisleConfig).length;
 const dynamicViewBoxWidth = totalAisles * aisleSpacing;
 svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
 
+// Draw warehouse sections
 function drawSections() {
   svg.innerHTML = ""; // Reset SVG before drawing again
 
@@ -68,10 +69,12 @@ function drawSections() {
   }
 }
 
+// Clear all highlighted sections
 function clearHighlights() {
   document.querySelectorAll(".section").forEach(el => el.classList.remove("highlight"));
 }
 
+// Search and highlight items
 async function searchItems(codes) {
   try {
     const response = await fetch("warehouse_inventory_map.csv");
@@ -84,6 +87,8 @@ async function searchItems(codes) {
 
     clearHighlights();
     const resultBox = document.getElementById("result");
+    resultBox.innerHTML = "";
+
     let foundItems = [];
     let notFoundItems = [];
 
@@ -111,16 +116,27 @@ async function searchItems(codes) {
       }
     });
 
-    resultBox.innerHTML = `
-      <div style="color:green;">✅ Found: ${foundItems.join(", ")}</div>
-      ${notFoundItems.length ? `<div style="color:orange;">⚠️ Not Found: ${notFoundItems.join(", ")}</div>` : ''}
-    `;
+    foundItems.forEach(code => {
+      const card = document.createElement('div');
+      card.className = 'result-card found';
+      card.textContent = `✅ Found: ${code}`;
+      resultBox.appendChild(card);
+    });
+
+    notFoundItems.forEach(code => {
+      const card = document.createElement('div');
+      card.className = 'result-card notfound';
+      card.textContent = `⚠️ Not Found: ${code}`;
+      resultBox.appendChild(card);
+    });
+
   } catch (error) {
     console.error("Error loading CSV:", error);
     document.getElementById("result").innerHTML = "⚠️ Error loading data.";
   }
 }
 
+// Listen to search input
 document.getElementById("searchBox").addEventListener("input", () => {
   const query = document.getElementById("searchBox").value.trim().toUpperCase();
   const codes = query.split(",").map(code => code.trim()).filter(Boolean);
@@ -132,5 +148,5 @@ document.getElementById("searchBox").addEventListener("input", () => {
   }
 });
 
-// Draw warehouse initially
+// Initialize map when page loads
 drawSections();
