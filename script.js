@@ -15,18 +15,12 @@ const sectionSize = 20;
 const padding = 2;
 const offsetX = 10;
 const svg = document.getElementById("aisles");
-
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
 const totalAisles = Object.keys(aisleConfig).length;
 const dynamicViewBoxWidth = totalAisles * aisleSpacing;
 svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
-
-const GITHUB_TOKEN = "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"; // Demo token
-const GITHUB_USERNAME = "gigtarget";
-const GITHUB_REPO = "NRTC-JD-v.2";
-const GITHUB_FILE_PATH = "feedback.txt";
 
 function drawSections() {
   svg.innerHTML = "";
@@ -131,55 +125,5 @@ clearBtn.addEventListener("click", () => {
   clearHighlights();
   document.getElementById("result").innerHTML = "";
 });
-
-// Handle Feedback Submit
-async function submitFeedback() {
-  const feedbackText = document.getElementById("feedbackInput").value.trim();
-  const feedbackMessage = document.getElementById("feedbackMessage");
-
-  if (!feedbackText) {
-    feedbackMessage.textContent = "⚠️ Please write something before submitting.";
-    return;
-  }
-
-  try {
-    const getFileUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}`;
-    const headers = {
-      "Authorization": `token ${GITHUB_TOKEN}`,
-      "Accept": "application/vnd.github.v3+json"
-    };
-
-    const response = await fetch(getFileUrl, { headers });
-    const fileData = await response.json();
-    const currentContent = atob(fileData.content);
-
-    const now = new Date();
-    const timestamp = now.toISOString().replace("T", " ").substring(0, 19);
-    const newContent = currentContent + `\n[${timestamp}] ${feedbackText}`;
-
-    const updateResponse = await fetch(getFileUrl, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify({
-        message: "New feedback submitted",
-        content: btoa(newContent),
-        sha: fileData.sha
-      })
-    });
-
-    if (updateResponse.ok) {
-      feedbackMessage.textContent = "✅ Feedback submitted successfully!";
-      document.getElementById("feedbackInput").value = "";
-    } else {
-      feedbackMessage.textContent = "❌ Failed to submit feedback. Try again.";
-    }
-
-  } catch (error) {
-    console.error("Error submitting feedback:", error);
-    feedbackMessage.textContent = "❌ Error connecting to GitHub.";
-  }
-}
-
-document.getElementById("submitFeedback").addEventListener("click", submitFeedback);
 
 drawSections();
