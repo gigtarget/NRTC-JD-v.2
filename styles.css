@@ -1,0 +1,101 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+}
+
+.container {
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
+
+h1 {
+  font-size: 26px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.mode-selector {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.mode-selector button {
+  padding: 10px 20px;
+  border: none;
+  background: #ccc;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mode-selector .active {
+  background: #2e7d32;
+  color: white;
+}
+
+.search-section input,
+.search-section textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+#result {
+  text-align: center;
+  margin: 10px 0;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.map-wrapper {
+  overflow-x: auto;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+svg {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 530px;
+  width: 100%;
+  height: auto;
+}
+
+.section {
+  fill: white;
+  stroke: red;
+  stroke-width: 0.6;
+}
+
+.highlight {
+  fill: yellow !important;
+  stroke: black;
+  stroke-width: 1.5;
+}
+
+.aisle-label {
+  font-size: 11px;
+  font-weight: bold;
+  fill: #333;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 22px;
+  }
+  #result {
+    font-size: 14px;
+  }
+}
