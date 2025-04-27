@@ -20,16 +20,14 @@ const totalAisles = Object.keys(aisleConfig).length;
 const dynamicViewBoxWidth = totalAisles * aisleSpacing;
 svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
 
-// Draw warehouse sections
 function drawSections() {
-  svg.innerHTML = ""; // Reset SVG before drawing again
+  svg.innerHTML = "";
 
   let index = 0;
   for (let aisle in aisleConfig) {
     const { front, back } = aisleConfig[aisle];
     const x = offsetX + index * aisleSpacing;
 
-    // Aisle Label
     const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
     label.setAttribute("x", x + sectionSize);
     label.setAttribute("y", 15);
@@ -37,7 +35,7 @@ function drawSections() {
     label.textContent = aisle;
     svg.appendChild(label);
 
-    // FRONT Sections
+    // FRONT
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -51,7 +49,7 @@ function drawSections() {
       });
     }
 
-    // BACK Sections
+    // BACK
     for (let i = 0; i < back; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -69,12 +67,10 @@ function drawSections() {
   }
 }
 
-// Clear all highlighted sections
 function clearHighlights() {
   document.querySelectorAll(".section").forEach(el => el.classList.remove("highlight"));
 }
 
-// Search and highlight items
 async function searchItems(codes) {
   try {
     const response = await fetch("warehouse_inventory_map.csv");
@@ -98,16 +94,20 @@ async function searchItems(codes) {
         const { aisle, level, block, side, section } = match;
         let highlightId = "";
 
-        if (level && block && side && section) {
-          highlightId = `${aisle}-${level}-${block.replace(/\s/g, '')}-${side}-${section}`;
-        } else {
-          highlightId = null;
-          document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
-        }
+        // 🔥 FIXED: only check for Section + Aisle available
+        if (aisle && section && block && side) {
+          highlightId = `${aisle}-${level || 'Top'}-${block.replace(/\s/g, '')}-${side}-${section}`;
 
-        if (highlightId) {
           const el = document.getElementById(highlightId);
-          if (el) el.classList.add("highlight");
+          if (el) {
+            el.classList.add("highlight");
+          } else {
+            // If exact section id not found, highlight entire aisle
+            document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
+          }
+        } else {
+          // Highlight entire aisle if missing info
+          document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
         }
 
         foundItems.push(code);
@@ -136,7 +136,6 @@ async function searchItems(codes) {
   }
 }
 
-// Listen to search input
 document.getElementById("searchBox").addEventListener("input", () => {
   const query = document.getElementById("searchBox").value.trim().toUpperCase();
   const codes = query.split(",").map(code => code.trim()).filter(Boolean);
@@ -148,5 +147,5 @@ document.getElementById("searchBox").addEventListener("input", () => {
   }
 });
 
-// Initialize map when page loads
+// Draw the map on page load
 drawSections();
