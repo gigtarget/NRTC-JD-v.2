@@ -28,7 +28,7 @@ function drawSections() {
     const { front, back } = aisleConfig[aisle];
     const x = offsetX + index++ * aisleSpacing;
 
-    // Label
+    // Aisle label
     const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
     label.setAttribute("x", x + sectionSize);
     label.setAttribute("y", 15);
@@ -36,7 +36,7 @@ function drawSections() {
     label.textContent = aisle;
     svg.appendChild(label);
 
-    // Front block
+    // Front block (Before Walkway)
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIdx) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -45,12 +45,12 @@ function drawSections() {
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
         rect.setAttribute("class", "section");
-        rect.setAttribute("data-key", `${aisle}-${side}-${i + 1}`);
+        rect.setAttribute("data-key", `${aisle}-BeforeWalkway-${side}-${i + 1}`);
         svg.appendChild(rect);
       });
     }
 
-    // Back block
+    // Back block (After Walkway)
     for (let i = 0; i < back; i++) {
       ["Left", "Right"].forEach((side, sIdx) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -59,7 +59,7 @@ function drawSections() {
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
         rect.setAttribute("class", "section");
-        rect.setAttribute("data-key", `${aisle}-${side}-${i + 1}`);
+        rect.setAttribute("data-key", `${aisle}-AfterWalkway-${side}-${i + 1}`);
         svg.appendChild(rect);
       });
     }
@@ -96,28 +96,39 @@ async function searchItems() {
       const grouped = {};
 
       matches.forEach(m => {
-        const groupKey = `${m.aisle}-${m.side}`;
+        const { aisle, side, section } = m;
+        const groupKey = `${aisle}-${side}`;
         if (!grouped[groupKey]) {
           grouped[groupKey] = [];
         }
-        grouped[groupKey].push(m.section);
+        grouped[groupKey].push(section);
 
-        const dataKey = `${m.aisle}-${m.side}-${m.section}`;
-        document.querySelectorAll(`[data-key="${dataKey}"]`).forEach(el => el.classList.add("highlight"));
+        // Highlighting correctly based on aisleConfig front number
+        const { front } = aisleConfig[aisle];
+        if (Number(section) <= front) {
+          // Before Walkway
+          document.querySelectorAll(`[data-key="${aisle}-BeforeWalkway-${side}-${section}"]`)
+            .forEach(el => el.classList.add("highlight"));
+        } else {
+          // After Walkway
+          const afterSectionNumber = Number(section) - front;
+          document.querySelectorAll(`[data-key="${aisle}-AfterWalkway-${side}-${afterSectionNumber}"]`)
+            .forEach(el => el.classList.add("highlight"));
+        }
       });
 
-      // Final merged result
+      // Final display
       for (let key in grouped) {
         const [aisle, side] = key.split("-");
         const sections = grouped[key].map(Number).sort((a, b) => a - b).join(", ");
         const totalSections = grouped[key].length;
-
         document.getElementById("result").innerHTML +=
           `✅ <strong>${q}</strong><br>` +
           `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>`;
       }
     } else {
-      document.getElementById("result").innerHTML += `⚠️ <strong>${q}</strong> - Item not found<br><br>`;
+      document.getElementById("result").innerHTML +=
+        `⚠️ <strong>${q}</strong> - Item not found<br><br>`;
     }
   });
 }
@@ -158,4 +169,5 @@ document.getElementById("feedbackForm").addEventListener("submit", (e) => {
     .catch(() => alert("⚠️ Network error."));
 });
 
+// Draw map at start
 drawSections();
