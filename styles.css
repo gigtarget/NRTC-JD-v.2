@@ -72,11 +72,15 @@ h1 {
 
 /* Result Cards */
 #result {
-  color: black;
   margin-top: 15px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* Force black color inside result */
+#result, #result * {
+  color: black !important;
 }
 
 .result-card {
@@ -141,7 +145,6 @@ svg {
   animation: shake 0.4s;
   border: 2px solid red;
 }
-
 
 .shake {
   animation: shake 0.5s;
