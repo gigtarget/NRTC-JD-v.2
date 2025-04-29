@@ -1,137 +1,194 @@
-/* Reset */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f7fb;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warehouse Article Locator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+    }
 
-.main-container {
-  padding: 20px;
-  max-width: 600px;
-  margin: auto;
-}
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
 
-h1 {
-  text-align: center;
-  font-size: 28px;
-  margin-bottom: 20px;
-  color: #333;
-}
+    .header img {
+      width: 70px;
+      height: auto;
+      border-radius: 8px;
+    }
 
-/* Card Container */
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
+    .header-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
 
-/* Search */
-.search-wrapper {
-  margin-bottom: 15px;
-}
+    .input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
 
-.search-bar {
-  background: #f0f2f5;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  padding: 10px 15px;
-}
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      padding-right: 30px;
+    }
 
-.search-icon {
-  font-size: 20px;
-  margin-right: 10px;
-  color: #888;
-}
+    #clearBtn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+      font-size: 18px;
+      display: none;
+    }
 
-.clear-icon {
-  font-size: 18px;
-  margin-left: 8px;
-  color: #888;
-  cursor: pointer;
-  user-select: none;
-}
+    #result {
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e7d32;
+      white-space: pre-line;
+    }
 
-.search-bar input {
-  border: none;
-  outline: none;
-  background: none;
-  font-size: 16px;
-  width: 100%;
-}
+    .map-wrapper {
+      overflow-x: auto;
+      padding: 10px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-.hint {
-  font-size: 12px;
-  color: #777;
-  margin-top: 6px;
-  display: block;
-  text-align: center;
-}
+    svg {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 530px;
+      width: 100%;
+      height: auto;
+    }
 
-/* Result Cards */
-#result {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+    .section {
+      fill: white;
+      stroke: red;
+      stroke-width: 0.6;
+    }
 
-.result-card {
-  padding: 12px 15px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
+    .highlight {
+      fill: yellow !important;
+      stroke: black;
+      stroke-width: 1.5;
+    }
 
-.result-card.found {
-  background: #e8f5e9;
-  border-left: 5px solid #4caf50;
-}
+    .aisle-label {
+      font-size: 11px;
+      font-weight: bold;
+      fill: #333;
+    }
 
-.result-card.notfound {
-  background: #fff3e0;
-  border-left: 5px solid #ff9800;
-}
+    /* Feedback section */
+    .feedback-section {
+      margin-top: 30px;
+      text-align: center;
+    }
 
-/* Map */
-.map-wrapper {
-  margin-top: 20px;
-  padding: 10px;
-  background: #fafafa;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
-}
+    .feedback-section textarea {
+      width: 70%;
+      max-width: 300px;
+      height: 60px;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: none;
+    }
 
-svg {
-  width: 100%;
-  height: auto;
-}
+    .feedback-section button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-.section {
-  fill: white;
-  stroke: red;
-  stroke-width: 0.6;
-}
+    .feedback-section button:hover {
+      background-color: #27632a;
+    }
 
-.highlight {
-  fill: yellow !important;
-  stroke: black;
-  stroke-width: 1.5;
-}
+    #thankYouMessage {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #2e7d32;
+      font-weight: bold;
+    }
 
-.aisle-label {
-  font-size: 11px;
-  font-weight: bold;
-  fill: #444;
-}
+    @media (max-width: 600px) {
+      .header-title {
+        font-size: 20px;
+      }
+      input[type="text"] {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
 
-/* Mobile */
-@media (max-width: 600px) {
-  h1 {
-    font-size: 24px;
-  }
-}
+  <div class="header">
+    <img src="your-logo.png" alt="Logo" />
+    <div class="header-title">Warehouse<br>Article Locator</div>
+  </div>
+
+  <p>Enter Item Code:</p>
+
+  <div class="input-wrapper">
+    <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
+    <span id="clearBtn">❌</span>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="map-wrapper">
+    <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
+  </div>
+
+  <!-- Feedback Form Section -->
+  <div class="feedback-section">
+    <h3>📢 Suggest a Change / Request New Stock</h3>
+    <form id="feedbackForm" action="https://formsubmit.co/jatindhiman1991@hotmail.com" method="POST">
+      <textarea name="message" placeholder="Building from scratch! Tell us what’s broken or brilliant — let’s make it awesome! 💪" required></textarea><br>
+      
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://gigtarget.github.io/NRTC-JD-v.2/">
+      
+      <button type="submit">Submit Feedback</button>
+    </form>
+
+    <p id="thankYouMessage" style="display:none;">✅ Thank you! Your feedback has been submitted.</p>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
