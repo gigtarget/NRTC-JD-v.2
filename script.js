@@ -1,150 +1,194 @@
-const aisleConfig = {
-  A: { front: 3, back: 9 },
-  B: { front: 3, back: 9 },
-  C: { front: 3, back: 9 },
-  D: { front: 3, back: 12 },
-  E: { front: 7, back: 12 },
-  F: { front: 7, back: 9 },
-  G: { front: 7, back: 12 },
-  H: { front: 7, back: 12 },
-  I: { front: 7, back: 12 },
-};
-
-const aisleSpacing = 55;
-const sectionSize = 20;
-const padding = 2;
-const offsetX = 10;
-const svg = document.getElementById("aisles");
-const searchBox = document.getElementById("searchBox");
-const clearBtn = document.getElementById("clearBtn");
-const resultBox = document.getElementById("result");
-
-const totalAisles = Object.keys(aisleConfig).length;
-svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
-
-function drawSections() {
-  svg.innerHTML = "";
-  let index = 0;
-  for (let aisle in aisleConfig) {
-    const { front, back } = aisleConfig[aisle];
-    const x = offsetX + index++ * aisleSpacing;
-
-    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label.setAttribute("x", x + sectionSize);
-    label.setAttribute("y", 15);
-    label.setAttribute("class", "aisle-label");
-    label.textContent = aisle;
-    svg.appendChild(label);
-
-    for (let i = 0; i < front; i++) {
-      ["Left", "Right"].forEach((side, sIdx) => {
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIdx * (sectionSize + padding));
-        rect.setAttribute("y", 30 + i * (sectionSize + padding));
-        rect.setAttribute("width", sectionSize);
-        rect.setAttribute("height", sectionSize);
-        rect.setAttribute("class", "section");
-        rect.setAttribute("data-key", `${aisle}-BeforeWalkway-${side}-${i + 1}`);
-        svg.appendChild(rect);
-      });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warehouse Article Locator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
     }
 
-    for (let i = 0; i < back; i++) {
-      ["Left", "Right"].forEach((side, sIdx) => {
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIdx * (sectionSize + padding));
-        rect.setAttribute("y", 220 + i * (sectionSize + padding));
-        rect.setAttribute("width", sectionSize);
-        rect.setAttribute("height", sectionSize);
-        rect.setAttribute("class", "section");
-        rect.setAttribute("data-key", `${aisle}-AfterWalkway-${side}-${i + 1}`);
-        svg.appendChild(rect);
-      });
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
     }
-  }
-}
 
-function clearHighlights() {
-  document.querySelectorAll(".section").forEach(el => el.classList.remove("highlight"));
-}
+    .header img {
+      width: 70px;
+      height: auto;
+      border-radius: 8px;
+    }
 
-async function searchItems() {
-  const queries = searchBox.value
-    .trim()
-    .toUpperCase()
-    .split(",")
-    .map(q => q.trim())
-    .filter(q => q);
+    .header-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
 
-  const res = await fetch("warehouse_inventory_map.csv");
-  const text = await res.text();
-  const rows = text.split("\n").slice(1);
-  const data = rows.map(r => {
-    const [code, aisle, level, block, side, section] = r.split(",").map(s => s.trim());
-    return { code, aisle, block, side, section };
-  });
+    .input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
 
-  clearHighlights();
-  resultBox.innerHTML = "";
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      padding-right: 30px;
+    }
 
-  let foundAny = false;
+    #clearBtn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #888;
+      font-size: 18px;
+      display: none;
+    }
 
-  queries.forEach(q => {
-    const matches = data.filter(r => r.code.toUpperCase() === q);
+    #result {
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #2e7d32;
+      white-space: pre-line;
+    }
 
-    if (matches.length) {
-      foundAny = true;
-      const grouped = {};
+    .map-wrapper {
+      overflow-x: auto;
+      padding: 10px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-      matches.forEach(m => {
-        const { aisle, block, side, section } = m;
-        const groupKey = `${aisle}-${side}`;
-        if (!grouped[groupKey]) {
-          grouped[groupKey] = [];
-        }
-        grouped[groupKey].push(section);
+    svg {
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 530px;
+      width: 100%;
+      height: auto;
+    }
 
-        const blockKey = block === "Before Walkway" ? "BeforeWalkway" : "AfterWalkway";
+    .section {
+      fill: white;
+      stroke: red;
+      stroke-width: 0.6;
+    }
 
-        document.querySelectorAll(`[data-key="${aisle}-${blockKey}-${side}-${Number(section)}"]`)
-          .forEach(el => el.classList.add("highlight"));
-      });
+    .highlight {
+      fill: yellow !important;
+      stroke: black;
+      stroke-width: 1.5;
+    }
 
-      for (let key in grouped) {
-        const [aisle, side] = key.split("-");
-        const sections = grouped[key].map(Number).sort((a, b) => a - b).join(", ");
-        const totalSections = grouped[key].length;
-        resultBox.innerHTML += `<div class="result-card found">✅ <b>${q}</b><br>Aisle: ${aisle} | Side: ${side}<br>Sections: ${sections} (Total: ${totalSections})</div>`;
+    .aisle-label {
+      font-size: 11px;
+      font-weight: bold;
+      fill: #333;
+    }
+
+    /* Feedback section */
+    .feedback-section {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .feedback-section textarea {
+      width: 70%;
+      max-width: 300px;
+      height: 60px;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: none;
+    }
+
+    .feedback-section button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .feedback-section button:hover {
+      background-color: #27632a;
+    }
+
+    #thankYouMessage {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .header-title {
+        font-size: 20px;
       }
-    } else {
-      resultBox.innerHTML += `<div class="result-card notfound">⚠️ <b>${q}</b> not found</div>`;
+      input[type="text"] {
+        width: 90%;
+      }
     }
-  });
+  </style>
+</head>
+<body>
 
-  if (!foundAny) {
-    searchBox.classList.add("shake");
-    setTimeout(() => {
-      searchBox.classList.remove("shake");
-    }, 500);
-  }
-}
+  <div class="header">
+    <img src="your-logo.png" alt="Logo" />
+    <div class="header-title">Warehouse<br>Article Locator</div>
+  </div>
 
-searchBox.addEventListener("input", () => {
-  if (searchBox.value.trim()) {
-    clearBtn.style.display = "inline";
-    searchItems();
-  } else {
-    clearBtn.style.display = "none";
-    clearHighlights();
-    resultBox.innerHTML = "";
-  }
-});
+  <p>Enter Item Code:</p>
 
-clearBtn.addEventListener("click", () => {
-  searchBox.value = "";
-  clearBtn.style.display = "none";
-  clearHighlights();
-  resultBox.innerHTML = "";
-});
+  <div class="input-wrapper">
+    <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
+    <span id="clearBtn">❌</span>
+  </div>
 
-drawSections();
+  <div id="result"></div>
+
+  <div class="map-wrapper">
+    <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
+  </div>
+
+  <!-- Feedback Form Section -->
+  <div class="feedback-section">
+    <h3>📢 Suggest a Change / Request New Stock</h3>
+    <form id="feedbackForm" action="https://formsubmit.co/jatindhiman1991@hotmail.com" method="POST">
+      <textarea name="message" placeholder="Building from scratch! Tell us what’s broken or brilliant — let’s make it awesome! 💪" required></textarea><br>
+      
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://gigtarget.github.io/NRTC-JD-v.2/">
+      
+      <button type="submit">Submit Feedback</button>
+    </form>
+
+    <p id="thankYouMessage" style="display:none;">✅ Thank you! Your feedback has been submitted.</p>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
