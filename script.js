@@ -86,23 +86,28 @@ async function searchItems() {
   resultBox.innerHTML = "";
 
   queries.forEach(query => {
-    const match = data.find(r => r.code === query);
+    const matches = data.filter(r => r.code.toUpperCase() === query);
 
-    if (match) {
-      const { aisle, level, block, side, section } = match;
-      let highlightId = "";
+    if (matches.length > 0) {
+      matches.forEach(match => {
+        const { aisle, level, block, side, section } = match;
+        let highlightId = "";
 
-      if (block && side && section) {
-        highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
-        const el = document.getElementById(highlightId);
-        if (el) el.classList.add("highlight");
-      } else if (aisle) {
-        document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
-      }
+        if (block && side && section) {
+          highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
+          const el = document.getElementById(highlightId);
+          if (el) el.classList.add("highlight");
+        } else if (aisle) {
+          document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
+        }
 
-      resultBox.innerHTML += `✅ ${query}\nAisle: ${aisle}\nLevel: ${level}\nBlock: ${block}\nSide: ${side}\n\n`;
+        resultBox.innerHTML += `
+          ✅ <strong>${query}</strong><br>
+          ➔ Aisle: <b>${aisle}</b> | Level: ${level} | Block: ${block} | Side: ${side} | Section: ${section}<br><br>
+        `;
+      });
     } else {
-      resultBox.innerHTML += `⚠️ ${query} - Item not found\n\n`;
+      resultBox.innerHTML += `⚠️ <strong>${query}</strong> - Item not found<br><br>`;
     }
   });
 }
@@ -126,10 +131,9 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
-// 🚀 Feedback Form Submission: prevent page reload, show Thank You
+// Feedback Form Submission (no changes needed here)
 document.getElementById("feedbackForm").addEventListener("submit", function(event) {
-  event.preventDefault(); // Stop page reload
-
+  event.preventDefault();
   const form = event.target;
   const formData = new FormData(form);
 
