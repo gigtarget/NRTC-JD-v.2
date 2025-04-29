@@ -1,4 +1,3 @@
-
 const aisleConfig = {
   A: { front: 3, back: 9 },
   B: { front: 3, back: 9 },
