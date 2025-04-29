@@ -19,8 +19,8 @@ const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
 const totalAisles = Object.keys(aisleConfig).length;
-const dynamicViewBoxWidth = totalAisles * aisleSpacing + 150; // for Bottom block shift
-svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
+const dynamicViewBoxWidth = totalAisles * aisleSpacing + 50;
+svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 900`); // Bigger height for Top + Bottom stacking
 
 function drawSections() {
   svg.innerHTML = "";
@@ -38,7 +38,7 @@ function drawSections() {
     label.textContent = aisle;
     svg.appendChild(label);
 
-    // TOP Before Walkway
+    // === TOP LEVEL ===
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -52,7 +52,6 @@ function drawSections() {
       });
     }
 
-    // TOP After Walkway
     for (let i = 0; i < back; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -66,12 +65,12 @@ function drawSections() {
       });
     }
 
-    // BOTTOM Before Walkway
+    // === BOTTOM LEVEL ===
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIndex * (sectionSize + padding) + 120); // shifted X for Bottom
-        rect.setAttribute("y", 30 + i * (sectionSize + padding));
+        rect.setAttribute("x", x + sIndex * (sectionSize + padding));
+        rect.setAttribute("y", 450 + i * (sectionSize + padding)); // Shifted Down for Bottom
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
         rect.setAttribute("class", "section");
@@ -80,12 +79,11 @@ function drawSections() {
       });
     }
 
-    // BOTTOM After Walkway
     for (let i = 0; i < back; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIndex * (sectionSize + padding) + 120);
-        rect.setAttribute("y", 220 + i * (sectionSize + padding));
+        rect.setAttribute("x", x + sIndex * (sectionSize + padding));
+        rect.setAttribute("y", 640 + i * (sectionSize + padding)); // Shifted Down for Bottom After
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
         rect.setAttribute("class", "section");
