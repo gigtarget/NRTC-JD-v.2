@@ -72,6 +72,7 @@ h1 {
 
 /* Result Cards */
 #result {
+  color: black;
   margin-top: 15px;
   display: flex;
   flex-direction: column;
