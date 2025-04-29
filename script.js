@@ -1,3 +1,27 @@
+const aisleConfig = {
+  A: { front: 3, back: 9 },
+  B: { front: 3, back: 9 },
+  C: { front: 3, back: 9 },
+  D: { front: 4, back: 12 },
+  E: { front: 7, back: 12 },
+  F: { front: 7, back: 9 },
+  G: { front: 7, back: 12 },
+  H: { front: 7, back: 12 },
+  I: { front: 7, back: 12 },
+};
+
+const aisleSpacing = 55;
+const sectionSize = 20;
+const padding = 2;
+const offsetX = 10;
+const svg = document.getElementById("aisles");
+const searchBox = document.getElementById("searchBox");
+const clearBtn = document.getElementById("clearBtn");
+
+const totalAisles = Object.keys(aisleConfig).length;
+const dynamicViewBoxWidth = totalAisles * aisleSpacing + 150; // for Bottom block shift
+svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
+
 function drawSections() {
   svg.innerHTML = "";
   let index = 0;
@@ -46,7 +70,7 @@ function drawSections() {
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIndex * (sectionSize + padding) + 120); // Push right for bottom
+        rect.setAttribute("x", x + sIndex * (sectionSize + padding) + 120); // shifted X for Bottom
         rect.setAttribute("y", 30 + i * (sectionSize + padding));
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
@@ -60,7 +84,7 @@ function drawSections() {
     for (let i = 0; i < back; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIndex * (sectionSize + padding) + 120); // Push right for bottom
+        rect.setAttribute("x", x + sIndex * (sectionSize + padding) + 120);
         rect.setAttribute("y", 220 + i * (sectionSize + padding));
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
@@ -73,3 +97,113 @@ function drawSections() {
     index++;
   }
 }
+
+function clearHighlights() {
+  document.querySelectorAll(".section").forEach(el => el.classList.remove("highlight"));
+}
+
+async function searchItems() {
+  const input = searchBox.value.trim().toUpperCase();
+  const queries = input.split(",").map(q => q.trim()).filter(q => q);
+  const response = await fetch("warehouse_inventory_map.csv");
+  const text = await response.text();
+  const rows = text.split("\n").slice(1);
+  const data = rows.map(row => {
+    const [code, aisle, level, block, side, section] = row.split(",").map(s => s.trim());
+    return { code, aisle, level, block, side, section };
+  });
+
+  const resultBox = document.getElementById("result");
+  clearHighlights();
+  resultBox.innerHTML = "";
+
+  queries.forEach(query => {
+    const matches = data.filter(r => r.code.toUpperCase() === query);
+
+    if (matches.length > 0) {
+      let aisles = new Set();
+      let levels = new Set();
+      let blocks = new Set();
+      let sides = new Set();
+      let sections = [];
+
+      matches.forEach(match => {
+        const { aisle, level, block, side, section } = match;
+
+        aisles.add(aisle);
+        levels.add(level);
+        blocks.add(block);
+        sides.add(side);
+        sections.push(Number(section));
+
+        // Highlight each section
+        if (block && side && section) {
+          const highlightId = `${aisle}-${level}-${block.replace(/\s/g, '')}-${side}-${section}`;
+          const el = document.getElementById(highlightId);
+          if (el) el.classList.add("highlight");
+        }
+      });
+
+      sections.sort((a, b) => a - b);
+
+      resultBox.innerHTML += `
+        <div class="result-card found">
+          ✅ <strong>${query}</strong><br>
+          ➔ Aisle: <b>${Array.from(aisles).join(", ")}</b><br>
+          ➔ Level: ${Array.from(levels).join(" & ")}<br>
+          ➔ Block: ${Array.from(blocks).join(" & ")}<br>
+          ➔ Side: ${Array.from(sides).join(", ")}<br>
+          ➔ Sections: ${sections.join(", ")} (Total: ${sections.length})
+        </div><br>
+      `;
+    } else {
+      resultBox.innerHTML += `
+        <div class="result-card notfound">
+          ⚠️ <strong>${query}</strong> - Item not found
+        </div><br>
+      `;
+    }
+  });
+}
+
+searchBox.addEventListener("input", () => {
+  const value = searchBox.value.trim();
+  clearBtn.style.display = value.length > 0 ? "inline" : "none";
+
+  if (value.length > 0) {
+    searchItems();
+  } else {
+    clearHighlights();
+    document.getElementById("result").innerHTML = "";
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  searchBox.value = "";
+  clearBtn.style.display = "none";
+  clearHighlights();
+  document.getElementById("result").innerHTML = "";
+});
+
+document.getElementById("feedbackForm")?.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const form = event.target;
+  const formData = new FormData(form);
+
+  fetch(form.action, {
+    method: "POST",
+    body: formData,
+    headers: { 'Accept': 'application/json' }
+  }).then(response => {
+    if (response.ok) {
+      form.style.display = "none";
+      document.getElementById("thankYouMessage").style.display = "block";
+    } else {
+      alert("⚠️ There was an error submitting your feedback. Please try again.");
+    }
+  }).catch(error => {
+    alert("⚠️ Network error. Please check your connection.");
+  });
+});
+
+drawSections();
