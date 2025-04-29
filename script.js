@@ -2,7 +2,7 @@ const aisleConfig = {
   A: { front: 3, back: 9 },
   B: { front: 3, back: 9 },
   C: { front: 3, back: 9 },
-  D: { front: 3, back: 12 },
+  D: { front: 4, back: 12 },
   E: { front: 7, back: 12 },
   F: { front: 7, back: 9 },
   G: { front: 7, back: 12 },
@@ -19,16 +19,18 @@ const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
 const totalAisles = Object.keys(aisleConfig).length;
-const dynamicViewBoxWidth = totalAisles * aisleSpacing;
-svg.setAttribute("viewBox", 0 0 ${dynamicViewBoxWidth} 550);
+const dynamicViewBoxWidth = totalAisles * aisleSpacing + 50;
+svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 900`); // Bigger height for Top + Bottom stacking
 
 function drawSections() {
   svg.innerHTML = "";
   let index = 0;
+
   for (let aisle in aisleConfig) {
     const { front, back } = aisleConfig[aisle];
     const x = offsetX + index * aisleSpacing;
 
+    // Aisle Label
     const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
     label.setAttribute("x", x + sectionSize);
     label.setAttribute("y", 15);
@@ -36,6 +38,7 @@ function drawSections() {
     label.textContent = aisle;
     svg.appendChild(label);
 
+    // === TOP LEVEL ===
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -44,7 +47,7 @@ function drawSections() {
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
         rect.setAttribute("class", "section");
-        rect.setAttribute("id", ${aisle}-Top-BeforeWalkway-${side}-${i + 1});
+        rect.setAttribute("id", `${aisle}-Top-BeforeWalkway-${side}-${i + 1}`);
         svg.appendChild(rect);
       });
     }
@@ -57,7 +60,34 @@ function drawSections() {
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
         rect.setAttribute("class", "section");
-        rect.setAttribute("id", ${aisle}-Top-AfterWalkway-${side}-${i + 1});
+        rect.setAttribute("id", `${aisle}-Top-AfterWalkway-${side}-${i + 1}`);
+        svg.appendChild(rect);
+      });
+    }
+
+    // === BOTTOM LEVEL ===
+    for (let i = 0; i < front; i++) {
+      ["Left", "Right"].forEach((side, sIndex) => {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x + sIndex * (sectionSize + padding));
+        rect.setAttribute("y", 450 + i * (sectionSize + padding)); // Shifted Down for Bottom
+        rect.setAttribute("width", sectionSize);
+        rect.setAttribute("height", sectionSize);
+        rect.setAttribute("class", "section");
+        rect.setAttribute("id", `${aisle}-Bottom-BeforeWalkway-${side}-${i + 1}`);
+        svg.appendChild(rect);
+      });
+    }
+
+    for (let i = 0; i < back; i++) {
+      ["Left", "Right"].forEach((side, sIndex) => {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x + sIndex * (sectionSize + padding));
+        rect.setAttribute("y", 640 + i * (sectionSize + padding)); // Shifted Down for Bottom After
+        rect.setAttribute("width", sectionSize);
+        rect.setAttribute("height", sectionSize);
+        rect.setAttribute("class", "section");
+        rect.setAttribute("id", `${aisle}-Bottom-AfterWalkway-${side}-${i + 1}`);
         svg.appendChild(rect);
       });
     }
@@ -89,38 +119,47 @@ async function searchItems() {
     const matches = data.filter(r => r.code.toUpperCase() === query);
 
     if (matches.length > 0) {
-      const grouped = {};
+      let aisles = new Set();
+      let levels = new Set();
+      let blocks = new Set();
+      let sides = new Set();
+      let sections = [];
 
       matches.forEach(match => {
         const { aisle, level, block, side, section } = match;
-        const key = ${aisle}|${level}|${block}|${side};
 
-        if (!grouped[key]) {
-          grouped[key] = [];
-        }
-        grouped[key].push(section);
+        aisles.add(aisle);
+        levels.add(level);
+        blocks.add(block);
+        sides.add(side);
+        sections.push(Number(section));
 
         // Highlight each section
         if (block && side && section) {
-          const highlightId = ${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section};
+          const highlightId = `${aisle}-${level}-${block.replace(/\s/g, '')}-${side}-${section}`;
           const el = document.getElementById(highlightId);
           if (el) el.classList.add("highlight");
         }
       });
 
-      // Output one line per grouped info
-      for (let key in grouped) {
-        const [aisle, level, block, side] = key.split("|");
-        const sections = grouped[key].sort((a, b) => Number(a) - Number(b)).join(", ");
-        const totalSections = grouped[key].length;
+      sections.sort((a, b) => a - b);
 
-        resultBox.innerHTML += 
+      resultBox.innerHTML += `
+        <div class="result-card found">
           ✅ <strong>${query}</strong><br>
-          ➔ Aisle: <b>${aisle}</b> | Level: ${level} | Block: ${block} | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>
-        ;
-      }
+          ➔ Aisle: <b>${Array.from(aisles).join(", ")}</b><br>
+          ➔ Level: ${Array.from(levels).join(" & ")}<br>
+          ➔ Block: ${Array.from(blocks).join(" & ")}<br>
+          ➔ Side: ${Array.from(sides).join(", ")}<br>
+          ➔ Sections: ${sections.join(", ")} (Total: ${sections.length})
+        </div><br>
+      `;
     } else {
-      resultBox.innerHTML += ⚠️ <strong>${query}</strong> - Item not found<br><br>;
+      resultBox.innerHTML += `
+        <div class="result-card notfound">
+          ⚠️ <strong>${query}</strong> - Item not found
+        </div><br>
+      `;
     }
   });
 }
@@ -144,8 +183,7 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
-// Feedback Form Submission (no changes)
-document.getElementById("feedbackForm").addEventListener("submit", function(event) {
+document.getElementById("feedbackForm")?.addEventListener("submit", function(event) {
   event.preventDefault();
   const form = event.target;
   const formData = new FormData(form);
