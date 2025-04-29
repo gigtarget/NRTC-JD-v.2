@@ -2,9 +2,9 @@ const aisleConfig = {
   A: { front: 3, back: 9 },
   B: { front: 3, back: 9 },
   C: { front: 3, back: 9 },
-  D: { front: 4, back: 12 },
+  D: { front: 3, back: 12 },
   E: { front: 7, back: 12 },
-  F: { front: 7, back: 12 },
+  F: { front: 7, back: 9 },
   G: { front: 7, back: 12 },
   H: { front: 7, back: 12 },
   I: { front: 7, back: 12 },
@@ -86,23 +86,37 @@ async function searchItems() {
   resultBox.innerHTML = "";
 
   queries.forEach(query => {
-    const match = data.find(r => r.code === query);
+    const matches = data.filter(r => r.code.toUpperCase() === query);
 
-    if (match) {
-      const { aisle, level, block, side, section } = match;
-      let highlightId = "";
+    if (matches.length > 0) {
+      const grouped = {};
 
-      if (block && side && section) {
-        highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
-        const el = document.getElementById(highlightId);
-        if (el) el.classList.add("highlight");
-      } else if (aisle) {
-        document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
+      matches.forEach(match => {
+        const { aisle, level, block, side, section } = match;
+        const key = `${aisle}|${level}|${block}|${side}`;
+
+        if (!grouped[key]) {
+          grouped[key] = [];
+        }
+        grouped[key].push(section);
+
+        if (block && side && section) {
+          const highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
+          const el = document.getElementById(highlightId);
+          if (el) el.classList.add("highlight");
+        }
+      });
+
+      for (let key in grouped) {
+        const [aisle, level, block, side] = key.split("|");
+        const sections = grouped[key].sort((a, b) => Number(a) - Number(b)).join(", ");
+        const totalSections = grouped[key].length;
+
+        resultBox.innerHTML += 
+          `✅ <strong>${query}</strong><br>➔ Aisle: <b>${aisle}</b> | Level: ${level} | Block: ${block} | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>`;
       }
-
-      resultBox.innerHTML += `✅ ${query}\nAisle: ${aisle}\nLevel: ${level}\nBlock: ${block}\nSide: ${side}\n\n`;
     } else {
-      resultBox.innerHTML += `⚠️ ${query} - Item not found\n\n`;
+      resultBox.innerHTML += `⚠️ <strong>${query}</strong> - Item not found<br><br>`;
     }
   });
 }
@@ -126,10 +140,8 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
-// 🚀 Feedback Form Submission: prevent page reload, show Thank You
 document.getElementById("feedbackForm").addEventListener("submit", function(event) {
-  event.preventDefault(); // Stop page reload
-
+  event.preventDefault();
   const form = event.target;
   const formData = new FormData(form);
 
