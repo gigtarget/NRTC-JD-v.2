@@ -103,21 +103,20 @@ async function searchItems() {
         }
         grouped[groupKey].push(section);
 
-        // Highlighting correctly based on aisleConfig front number
+        // Highlight continuously (no Before/After Walkway reset)
+        const sectionNumber = Number(section);
         const { front } = aisleConfig[aisle];
-        if (Number(section) <= front) {
-          // Before Walkway
-          document.querySelectorAll(`[data-key="${aisle}-BeforeWalkway-${side}-${section}"]`)
+
+        if (sectionNumber <= front) {
+          document.querySelectorAll(`[data-key="${aisle}-BeforeWalkway-${side}-${sectionNumber}"]`)
             .forEach(el => el.classList.add("highlight"));
         } else {
-          // After Walkway
-          const afterSectionNumber = Number(section) - front;
-          document.querySelectorAll(`[data-key="${aisle}-AfterWalkway-${side}-${afterSectionNumber}"]`)
+          document.querySelectorAll(`[data-key="${aisle}-AfterWalkway-${side}-${sectionNumber}"]`)
             .forEach(el => el.classList.add("highlight"));
         }
       });
 
-      // Final display
+      // Display results
       for (let key in grouped) {
         const [aisle, side] = key.split("-");
         const sections = grouped[key].map(Number).sort((a, b) => a - b).join(", ");
@@ -151,23 +150,5 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
-document.getElementById("feedbackForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  fetch(e.target.action, {
-    method: "POST",
-    body: new FormData(e.target),
-    headers: { Accept: "application/json" },
-  })
-    .then(r => {
-      if (r.ok) {
-        e.target.style.display = "none";
-        document.getElementById("thankYouMessage").style.display = "block";
-      } else {
-        alert("⚠️ Error submitting feedback.");
-      }
-    })
-    .catch(() => alert("⚠️ Network error."));
-});
-
-// Draw map at start
+// Draw on load
 drawSections();
