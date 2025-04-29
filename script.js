@@ -17,6 +17,7 @@ const offsetX = 10;
 const svg = document.getElementById("aisles");
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
+const resultBox = document.getElementById("result");
 
 const totalAisles = Object.keys(aisleConfig).length;
 svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
@@ -84,12 +85,15 @@ async function searchItems() {
   });
 
   clearHighlights();
-  document.getElementById("result").innerHTML = "";
+  resultBox.innerHTML = "";
+
+  let foundAny = false;
 
   queries.forEach(q => {
     const matches = data.filter(r => r.code.toUpperCase() === q);
 
     if (matches.length) {
+      foundAny = true;
       const grouped = {};
 
       matches.forEach(m => {
@@ -110,15 +114,19 @@ async function searchItems() {
         const [aisle, side] = key.split("-");
         const sections = grouped[key].map(Number).sort((a, b) => a - b).join(", ");
         const totalSections = grouped[key].length;
-        document.getElementById("result").innerHTML +=
-          `✅ <strong>${q}</strong><br>` +
-          `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>`;
+        resultBox.innerHTML += `<div class="result-card found">✅ <b>${q}</b><br>Aisle: ${aisle} | Side: ${side}<br>Sections: ${sections} (Total: ${totalSections})</div>`;
       }
     } else {
-      document.getElementById("result").innerHTML +=
-        `⚠️ <strong>${q}</strong> - Item not found<br><br>`;
+      resultBox.innerHTML += `<div class="result-card notfound">⚠️ <b>${q}</b> not found</div>`;
     }
   });
+
+  if (!foundAny) {
+    searchBox.classList.add("shake");
+    setTimeout(() => {
+      searchBox.classList.remove("shake");
+    }, 500);
+  }
 }
 
 searchBox.addEventListener("input", () => {
@@ -128,7 +136,7 @@ searchBox.addEventListener("input", () => {
   } else {
     clearBtn.style.display = "none";
     clearHighlights();
-    document.getElementById("result").innerHTML = "";
+    resultBox.innerHTML = "";
   }
 });
 
@@ -136,8 +144,7 @@ clearBtn.addEventListener("click", () => {
   searchBox.value = "";
   clearBtn.style.display = "none";
   clearHighlights();
-  document.getElementById("result").innerHTML = "";
+  resultBox.innerHTML = "";
 });
 
-// Initialize map
 drawSections();
