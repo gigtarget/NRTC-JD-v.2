@@ -89,23 +89,36 @@ async function searchItems() {
     const matches = data.filter(r => r.code.toUpperCase() === query);
 
     if (matches.length > 0) {
+      const grouped = {};
+
       matches.forEach(match => {
         const { aisle, level, block, side, section } = match;
-        let highlightId = "";
+        const key = `${aisle}|${level}|${block}|${side}`;
 
+        if (!grouped[key]) {
+          grouped[key] = [];
+        }
+        grouped[key].push(section);
+
+        // Highlight each section
         if (block && side && section) {
-          highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
+          const highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
           const el = document.getElementById(highlightId);
           if (el) el.classList.add("highlight");
-        } else if (aisle) {
-          document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
         }
+      });
+
+      // Output one line per grouped info
+      for (let key in grouped) {
+        const [aisle, level, block, side] = key.split("|");
+        const sections = grouped[key].sort((a, b) => Number(a) - Number(b)).join(", ");
+        const totalSections = grouped[key].length;
 
         resultBox.innerHTML += `
           ✅ <strong>${query}</strong><br>
-          ➔ Aisle: <b>${aisle}</b> | Level: ${level} | Block: ${block} | Side: ${side} | Section: ${section}<br><br>
+          ➔ Aisle: <b>${aisle}</b> | Level: ${level} | Block: ${block} | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>
         `;
-      });
+      }
     } else {
       resultBox.innerHTML += `⚠️ <strong>${query}</strong> - Item not found<br><br>`;
     }
@@ -131,7 +144,7 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
-// Feedback Form Submission (no changes needed here)
+// Feedback Form Submission (no changes)
 document.getElementById("feedbackForm").addEventListener("submit", function(event) {
   event.preventDefault();
   const form = event.target;
