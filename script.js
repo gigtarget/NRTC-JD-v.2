@@ -4,7 +4,7 @@ const aisleConfig = {
   C: { front: 3, back: 9 },
   D: { front: 4, back: 12 },
   E: { front: 7, back: 12 },
-  F: { front: 7, back: 9 },
+  F: { front: 7, back: 12 },
   G: { front: 7, back: 12 },
   H: { front: 7, back: 12 },
   I: { front: 7, back: 12 },
@@ -19,18 +19,16 @@ const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 
 const totalAisles = Object.keys(aisleConfig).length;
-const dynamicViewBoxWidth = totalAisles * aisleSpacing + 50;
-svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 900`); // Bigger height for Top + Bottom stacking
+const dynamicViewBoxWidth = totalAisles * aisleSpacing;
+svg.setAttribute("viewBox", `0 0 ${dynamicViewBoxWidth} 550`);
 
 function drawSections() {
   svg.innerHTML = "";
   let index = 0;
-
   for (let aisle in aisleConfig) {
     const { front, back } = aisleConfig[aisle];
     const x = offsetX + index * aisleSpacing;
 
-    // Aisle Label
     const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
     label.setAttribute("x", x + sectionSize);
     label.setAttribute("y", 15);
@@ -38,7 +36,6 @@ function drawSections() {
     label.textContent = aisle;
     svg.appendChild(label);
 
-    // === TOP LEVEL ===
     for (let i = 0; i < front; i++) {
       ["Left", "Right"].forEach((side, sIndex) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -61,33 +58,6 @@ function drawSections() {
         rect.setAttribute("height", sectionSize);
         rect.setAttribute("class", "section");
         rect.setAttribute("id", `${aisle}-Top-AfterWalkway-${side}-${i + 1}`);
-        svg.appendChild(rect);
-      });
-    }
-
-    // === BOTTOM LEVEL ===
-    for (let i = 0; i < front; i++) {
-      ["Left", "Right"].forEach((side, sIndex) => {
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIndex * (sectionSize + padding));
-        rect.setAttribute("y", 450 + i * (sectionSize + padding)); // Shifted Down for Bottom
-        rect.setAttribute("width", sectionSize);
-        rect.setAttribute("height", sectionSize);
-        rect.setAttribute("class", "section");
-        rect.setAttribute("id", `${aisle}-Bottom-BeforeWalkway-${side}-${i + 1}`);
-        svg.appendChild(rect);
-      });
-    }
-
-    for (let i = 0; i < back; i++) {
-      ["Left", "Right"].forEach((side, sIndex) => {
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIndex * (sectionSize + padding));
-        rect.setAttribute("y", 640 + i * (sectionSize + padding)); // Shifted Down for Bottom After
-        rect.setAttribute("width", sectionSize);
-        rect.setAttribute("height", sectionSize);
-        rect.setAttribute("class", "section");
-        rect.setAttribute("id", `${aisle}-Bottom-AfterWalkway-${side}-${i + 1}`);
         svg.appendChild(rect);
       });
     }
@@ -116,50 +86,23 @@ async function searchItems() {
   resultBox.innerHTML = "";
 
   queries.forEach(query => {
-    const matches = data.filter(r => r.code.toUpperCase() === query);
+    const match = data.find(r => r.code === query);
 
-    if (matches.length > 0) {
-      let aisles = new Set();
-      let levels = new Set();
-      let blocks = new Set();
-      let sides = new Set();
-      let sections = [];
+    if (match) {
+      const { aisle, level, block, side, section } = match;
+      let highlightId = "";
 
-      matches.forEach(match => {
-        const { aisle, level, block, side, section } = match;
+      if (block && side && section) {
+        highlightId = `${aisle}-Top-${block.replace(/\s/g, '')}-${side}-${section}`;
+        const el = document.getElementById(highlightId);
+        if (el) el.classList.add("highlight");
+      } else if (aisle) {
+        document.querySelectorAll(`[id^="${aisle}-"]`).forEach(el => el.classList.add("highlight"));
+      }
 
-        aisles.add(aisle);
-        levels.add(level);
-        blocks.add(block);
-        sides.add(side);
-        sections.push(Number(section));
-
-        // Highlight each section
-        if (block && side && section) {
-          const highlightId = `${aisle}-${level}-${block.replace(/\s/g, '')}-${side}-${section}`;
-          const el = document.getElementById(highlightId);
-          if (el) el.classList.add("highlight");
-        }
-      });
-
-      sections.sort((a, b) => a - b);
-
-      resultBox.innerHTML += `
-        <div class="result-card found">
-          ✅ <strong>${query}</strong><br>
-          ➔ Aisle: <b>${Array.from(aisles).join(", ")}</b><br>
-          ➔ Level: ${Array.from(levels).join(" & ")}<br>
-          ➔ Block: ${Array.from(blocks).join(" & ")}<br>
-          ➔ Side: ${Array.from(sides).join(", ")}<br>
-          ➔ Sections: ${sections.join(", ")} (Total: ${sections.length})
-        </div><br>
-      `;
+      resultBox.innerHTML += `✅ ${query}\nAisle: ${aisle}\nLevel: ${level}\nBlock: ${block}\nSide: ${side}\n\n`;
     } else {
-      resultBox.innerHTML += `
-        <div class="result-card notfound">
-          ⚠️ <strong>${query}</strong> - Item not found
-        </div><br>
-      `;
+      resultBox.innerHTML += `⚠️ ${query} - Item not found\n\n`;
     }
   });
 }
@@ -183,8 +126,10 @@ clearBtn.addEventListener("click", () => {
   document.getElementById("result").innerHTML = "";
 });
 
-document.getElementById("feedbackForm")?.addEventListener("submit", function(event) {
-  event.preventDefault();
+// 🚀 Feedback Form Submission: prevent page reload, show Thank You
+document.getElementById("feedbackForm").addEventListener("submit", function(event) {
+  event.preventDefault(); // Stop page reload
+
   const form = event.target;
   const formData = new FormData(form);
 
