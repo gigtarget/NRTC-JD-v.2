@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Warehouse Article Locator</title>
+  <meta charset="UTF-8">
+  <title>Warehouse Section Locator</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,181 +11,56 @@
       padding: 20px;
       background: #f4f4f4;
     }
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 10px;
+    h1 {
+      margin-bottom: 20px;
     }
-
-    .header img {
-      width: 70px;
-      height: auto;
-      border-radius: 8px;
-    }
-
-    .header-title {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-
     input[type="text"] {
       padding: 10px;
       font-size: 16px;
-      width: 80%;
-      max-width: 300px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      padding-right: 30px;
+      width: 300px;
+      margin-bottom: 10px;
     }
-
     #clearBtn {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #888;
-      font-size: 18px;
       display: none;
-    }
-
-    #result {
-      margin-top: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #2e7d32;
-      white-space: pre-line;
-    }
-
-    .map-wrapper {
-      overflow-x: auto;
+      margin-left: 10px;
       padding: 10px;
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
+      font-size: 14px;
     }
-
+    #result {
+      margin-top: 15px;
+      font-size: 16px;
+    }
+    .section {
+      fill: none;
+      stroke: red;
+      stroke-width: 1;
+    }
+    .highlight {
+      fill: yellow;
+      stroke: black;
+      stroke-width: 2;
+    }
+    .aisle-label {
+      font-size: 14px;
+      font-weight: bold;
+    }
     svg {
       background: white;
       border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      max-width: 530px;
-      width: 100%;
-      height: auto;
-    }
-
-    .section {
-      fill: white;
-      stroke: red;
-      stroke-width: 0.6;
-    }
-
-    .highlight {
-      fill: yellow !important;
-      stroke: black;
-      stroke-width: 1.5;
-    }
-
-    .aisle-label {
-      font-size: 11px;
-      font-weight: bold;
-      fill: #333;
-    }
-
-    /* Feedback section */
-    .feedback-section {
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    .feedback-section textarea {
-      width: 70%;
-      max-width: 300px;
-      height: 60px;
-      padding: 8px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      resize: none;
-    }
-
-    .feedback-section button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #2e7d32;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .feedback-section button:hover {
-      background-color: #27632a;
-    }
-
-    #thankYouMessage {
-      margin-top: 15px;
-      font-size: 16px;
-      color: #2e7d32;
-      font-weight: bold;
-    }
-
-    @media (max-width: 600px) {
-      .header-title {
-        font-size: 20px;
-      }
-      input[type="text"] {
-        width: 90%;
-      }
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <img src="your-logo.png" alt="Logo" />
-    <div class="header-title">Warehouse<br>Article Locator</div>
-  </div>
+  <h1>Warehouse Section Locator</h1>
 
-  <p>Enter Item Code:</p>
-
-  <div class="input-wrapper">
-    <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
-    <span id="clearBtn">❌</span>
-  </div>
+  <input type="text" id="searchBox" placeholder="Enter item codes (comma separated)">
+  <button id="clearBtn">Clear</button>
 
   <div id="result"></div>
 
-  <div class="map-wrapper">
-    <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
-  </div>
-
-  <!-- Feedback Form Section -->
-  <div class="feedback-section">
-    <h3>📢 Suggest a Change / Request New Stock</h3>
-    <form id="feedbackForm" action="https://formsubmit.co/jatindhiman1991@hotmail.com" method="POST">
-      <textarea name="message" placeholder="Building from scratch! Tell us what’s broken or brilliant — let’s make it awesome! 💪" required></textarea><br>
-      
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_next" value="https://gigtarget.github.io/NRTC-JD-v.2/">
-      
-      <button type="submit">Submit Feedback</button>
-    </form>
-
-    <p id="thankYouMessage" style="display:none;">✅ Thank you! Your feedback has been submitted.</p>
-  </div>
+  <svg id="aisles" width="100%" height="600"></svg>
 
   <script src="script.js"></script>
 
