@@ -4,16 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Warehouse Article Locator</title>
-
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KNYST1M2D7"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KNYST1M2D7');
-  </script>
-
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -114,6 +104,7 @@
       fill: #333;
     }
 
+    /* Feedback section */
     .feedback-section {
       margin-top: 30px;
       text-align: center;
@@ -164,17 +155,6 @@
 </head>
 <body>
 
-  <!-- Floating Live Users Widget -->
-  <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <iframe width="240" height="90"
-      src="https://lookerstudio.google.com/embed/reporting/e3d439ee-a69b-4044-88cd-e279c4b3a38d/page/uM0IF"
-      frameborder="0"
-      style="border: none; border-radius: 8px;"
-      allowfullscreen
-      sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
-    </iframe>
-  </div>
-
   <div class="header">
     <img src="your-logo.png" alt="Logo" />
     <div class="header-title">Warehouse<br>Article Locator</div>
@@ -204,6 +184,7 @@
       
       <button type="submit">Submit Feedback</button>
     </form>
+
     <p id="thankYouMessage" style="display:none;">✅ Thank you! Your feedback has been submitted.</p>
   </div>
 
