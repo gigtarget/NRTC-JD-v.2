@@ -30,7 +30,7 @@ KHS,B,Top,After Walkway,Left,1
 KHS,B,Top,After Walkway,Left,2
 KHS,B,Top,After Walkway,Left,3
 KCN,B,Top,After Walkway,Left,4
-ASJ,B,Top,After Walkway,Left,5
+KCN,B,Top,After Walkway,Left,5
 YCN,B,Top,After Walkway,Left,6
 YCN,B,Top,After Walkway,Left,7
 YCN,B,Top,After Walkway,Left,8
@@ -52,7 +52,7 @@ AGDT,B,Top,Before Walkway,Right,2
 AGDT,B,Top,Before Walkway,Right,3
 AGDT,B,Top,After Walkway,Right,1
 AGDT,B,Top,After Walkway,Right,2
-AGJ,B,Top,After Walkway,Right,3
+ASJ,B,Top,After Walkway,Right,3
 LSJ,B,Top,After Walkway,Right,4
 YHZ,B,Top,After Walkway,Right,5
 YHZ,B,Top,After Walkway,Right,6
