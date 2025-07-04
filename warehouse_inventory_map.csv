@@ -78,11 +78,11 @@ LST,C,Top,After Walkway,Left,1
 LST,C,Top,After Walkway,Left,2
 LST,C,Top,After Walkway,Left,3
 LST,C,Top,After Walkway,Left,4
-LST,C,Top,After Walkway,Left,5
-LST,C,Top,After Walkway,Left,6
-LST,C,Top,After Walkway,Left,7
-LST,C,Top,After Walkway,Left,8
-LST,C,Top,After Walkway,Left,9
+LVT,C,Top,After Walkway,Left,5
+LVT,C,Top,After Walkway,Left,6
+LVT,C,Top,After Walkway,Left,7
+LVT,C,Top,After Walkway,Left,8
+LVT,C,Top,After Walkway,Left,9
 ARNH,C,Bottom,Before Walkway,Left,1
 ANH,C,Bottom,Before Walkway,Left,2
 ANH,C,Bottom,Before Walkway,Left,3
