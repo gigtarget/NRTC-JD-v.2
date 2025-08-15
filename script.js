@@ -1,3 +1,4 @@
+// == Original geometry & logic kept intact ==
 const aisleConfig = {
   A: { front: 3, back: 9 },
   B: { front: 3, back: 9 },
@@ -17,10 +18,56 @@ const offsetX = 10;
 const svg = document.getElementById("aisles");
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
+const themeBtn = document.getElementById("themeToggle");
 
 const totalAisles = Object.keys(aisleConfig).length;
 svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
 
+// ---- Pulse overlay helpers (style-only) ----
+let pulseLayer = null;
+function ensurePulseLayer() {
+  if (!pulseLayer) {
+    pulseLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    pulseLayer.setAttribute("id", "pulseLayer");
+    svg.appendChild(pulseLayer);
+  }
+}
+function addPulseAtRect(rect, color = "rgba(16,185,129,.9)") {
+  ensurePulseLayer();
+  const x = parseFloat(rect.getAttribute("x")) || 0;
+  const y = parseFloat(rect.getAttribute("y")) || 0;
+  const w = parseFloat(rect.getAttribute("width")) || sectionSize;
+  const h = parseFloat(rect.getAttribute("height")) || sectionSize;
+  const cx = x + w/2, cy = y + h/2;
+
+  const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  ring.setAttribute("cx", cx);
+  ring.setAttribute("cy", cy);
+  ring.setAttribute("r", 2);
+  ring.setAttribute("class", "pulse-ring");
+  ring.setAttribute("fill", "none");
+  ring.setAttribute("stroke", color);
+  pulseLayer.appendChild(ring);
+
+  setTimeout(() => ring.remove(), 1200);
+}
+function redCenterPulse() {
+  ensurePulseLayer();
+  const vb = (svg.getAttribute("viewBox") || "0 0 530 550").split(" ").map(Number);
+  const cx = vb[2] / 2, cy = vb[3] / 2;
+  const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  circle.setAttribute("cx", cx);
+  circle.setAttribute("cy", cy);
+  circle.setAttribute("r", 0);
+  circle.setAttribute("fill", "none");
+  circle.setAttribute("stroke", "rgba(244,63,94,.85)");
+  circle.setAttribute("stroke-width", 2);
+  circle.style.animation = "pulseErrKf 0.9s ease-out 1";
+  pulseLayer.appendChild(circle);
+  setTimeout(() => circle.remove(), 900);
+}
+
+// ---- Draw map (unchanged) ----
 function drawSections() {
   svg.innerHTML = "";
   let index = 0;
@@ -61,10 +108,15 @@ function drawSections() {
       });
     }
   }
+  // recreate pulse layer on top
+  pulseLayer = null;
+  ensurePulseLayer();
 }
 
+// ---- Highlights (original + pulse) ----
 function clearHighlights() {
   document.querySelectorAll(".section").forEach(el => el.classList.remove("highlight"));
+  if (pulseLayer) pulseLayer.innerHTML = "";
 }
 
 async function searchItems() {
@@ -86,6 +138,8 @@ async function searchItems() {
   clearHighlights();
   document.getElementById("result").innerHTML = "";
 
+  let totalHighlights = 0;
+
   queries.forEach(q => {
     const matches = data.filter(r => r.code.toUpperCase() === q);
 
@@ -95,15 +149,18 @@ async function searchItems() {
       matches.forEach(m => {
         const { aisle, block, side, section } = m;
         const groupKey = `${aisle}-${side}`;
-        if (!grouped[groupKey]) {
-          grouped[groupKey] = [];
-        }
+        if (!grouped[groupKey]) grouped[groupKey] = [];
         grouped[groupKey].push(section);
 
         const blockKey = block === "Before Walkway" ? "BeforeWalkway" : "AfterWalkway";
 
-        document.querySelectorAll(`[data-key="${aisle}-${blockKey}-${side}-${Number(section)}"]`)
-          .forEach(el => el.classList.add("highlight"));
+        document
+          .querySelectorAll(`[data-key="${aisle}-${blockKey}-${side}-${Number(section)}"]`)
+          .forEach(el => {
+            el.classList.add("highlight");
+            addPulseAtRect(el);          // <- pulse ring on each highlight (style-only)
+            totalHighlights++;
+          });
       });
 
       for (let key in grouped) {
@@ -119,8 +176,22 @@ async function searchItems() {
         `⚠️ <strong>${q}</strong> - Item not found<br><br>`;
     }
   });
+
+  // visual feedback if user typed something but nothing matched
+  if (queries.length > 0 && totalHighlights === 0) {
+    redCenterPulse();
+  }
 }
 
+// ---- Theme toggle (style-only) ----
+if (themeBtn) {
+  themeBtn.addEventListener("click", () => {
+    const isDark = document.body.classList.toggle("dark");
+    localStorage.setItem("wal-theme", isDark ? "dark" : "light");
+  });
+}
+
+// ---- Input events (unchanged) ----
 searchBox.addEventListener("input", () => {
   if (searchBox.value.trim()) {
     clearBtn.style.display = "inline";
