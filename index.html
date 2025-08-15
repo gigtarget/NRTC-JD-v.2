@@ -14,15 +14,14 @@
     gtag('config', 'G-KNYST1M2D7');
   </script>
 
-  <!-- App styles -->
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Theme variables + pulse animations -->
+  <!-- Theme vars + pulse animations -->
   <style>
     :root{
       --bg:#f4f4f4; --text:#111; --muted:#333; --card:#fff; --border:#ccc;
       --found-bg:#e8f5e9; --found-left:#4caf50; --warn-bg:#fff3e0; --warn-left:#ff9800;
-      --map-line:#e54b4b; --hi-fill:#ffeb3b; --hi-stroke:#111;
+      --map-line:red; --hi-fill:yellow; --hi-stroke:black;
       --btn-bg:#fff; --btn-fg:#111; --btn-border:#ccc;
     }
     body.dark{
@@ -32,8 +31,7 @@
       --btn-bg:rgba(255,255,255,.06); --btn-fg:#e8ecf2; --btn-border:rgba(255,255,255,.18);
     }
 
-    /* Small extras for toolbar & pulses */
-    .controls { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .controls { display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; }
     .toolbar { display:inline-flex; gap:8px; align-items:center; }
     .btn {
       display:inline-flex; align-items:center; gap:6px; padding:8px 12px; font-size:14px; border-radius:10px;
@@ -42,14 +40,13 @@
     }
     .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,0,0,.12); }
 
+    /* Pulses */
     @keyframes pulseRingKf{from{r:2;opacity:.9;stroke-width:2}to{r:18;opacity:0;stroke-width:0}}
     @keyframes pulseErrKf{from{r:0;opacity:.35}to{r:180;opacity:0}}
     .pulse-ring{fill:none;stroke:rgba(16,185,129,.9);animation:pulseRingKf 1.2s ease-out 1;pointer-events:none}
     body.dark .highlight { filter: drop-shadow(0 0 6px rgba(16,185,129,.85)) drop-shadow(0 0 12px rgba(16,185,129,.55)); }
-  </style>
 
-  <!-- Keep your original inline layout (minor tweaks only) -->
-  <style>
+    /* Layout tweaks (keep original sizing) */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
@@ -64,8 +61,8 @@
 
     .input-wrapper { position: relative; display: inline-block; }
     input[type="text"] {
-      padding: 12px 42px 12px 14px; font-size: 16px; width: min(90vw, 520px);
-      border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text);
+      padding: 10px 38px 10px 12px; font-size: 16px; width: 80%; max-width: 300px; /* smaller bar (original) */
+      border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text);
     }
     #clearBtn {
       position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
@@ -76,13 +73,12 @@
 
     .map-wrapper { overflow-x: auto; padding: 10px; margin-top: 16px; display: flex; justify-content: center; }
     svg {
-      background: var(--card); border: 1px solid var(--border); padding: 16px; border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08); max-width: 980px; width: 100%; height: auto;
+      background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); max-width: 530px; width: 100%; height: auto; /* original ratio */
     }
-    /* softer rounded sections */
-    .section { fill: white; stroke: var(--map-line); stroke-width: .9; rx: 7; ry: 7; }
-    .highlight { fill: var(--hi-fill) !important; stroke: var(--hi-stroke); stroke-width: 1.4; }
-    .aisle-label { font-size: 13px; font-weight: 800; fill: var(--muted); }
+    .section { fill: white; stroke: var(--map-line); stroke-width: 0.6; } /* outlines as original */
+    .highlight { fill: var(--hi-fill) !important; stroke: var(--hi-stroke); stroke-width: 1.5; }
+    .aisle-label { font-size: 11px; font-weight: bold; fill: var(--muted); }
 
     .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
 
@@ -98,11 +94,6 @@
     }
     .feedback-section button:hover { background-color: #27632a; }
     #thankYouMessage { margin-top: 15px; font-size: 16px; color: #2e7d32; font-weight: bold; }
-
-    @media (max-width: 720px) {
-      .controls { gap: 8px; }
-      input[type="text"] { width: min(92vw, 420px); }
-    }
   </style>
 </head>
 <body>
@@ -117,7 +108,7 @@
       <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
       <span id="clearBtn">❌</span>
     </div>
-    <!-- Theme toggle sits OUTSIDE the input wrapper: no overlap with ❌ -->
+    <!-- Theme toggle outside the input wrapper (no overlap) -->
     <div class="toolbar">
       <button id="themeToggle" class="btn" title="Toggle theme">🌓 Theme</button>
     </div>
@@ -145,9 +136,9 @@
 
   <script src="script.js"></script>
   <script>
-    // Theme bootstrap: restore persisted theme correctly
+    // Theme bootstrap: restore persisted theme
     (function(){
-      const saved = localStorage.getItem('wal-theme') || 'light'; // default light
+      const saved = localStorage.getItem('wal-theme') || 'light';
       document.body.classList.toggle('dark', saved === 'dark');
     })();
   </script>
