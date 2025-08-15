@@ -1,214 +1,143 @@
-// == Original geometry & logic kept intact ==
-const aisleConfig = {
-  A: { front: 3, back: 9 },
-  B: { front: 3, back: 9 },
-  C: { front: 3, back: 9 },
-  D: { front: 3, back: 12 },
-  E: { front: 7, back: 12 },
-  F: { front: 7, back: 9 },
-  G: { front: 7, back: 12 },
-  H: { front: 7, back: 12 },
-  I: { front: 7, back: 12 },
-};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warehouse Article Locator</title>
 
-const aisleSpacing = 55;
-const sectionSize = 20;
-const padding = 2;
-const offsetX = 10;
-const svg = document.getElementById("aisles");
-const searchBox = document.getElementById("searchBox");
-const clearBtn = document.getElementById("clearBtn");
-const themeBtn = document.getElementById("themeToggle");
+  <!-- Google Analytics (unchanged) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KNYST1M2D7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KNYST1M2D7');
+  </script>
 
-const totalAisles = Object.keys(aisleConfig).length;
-svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
+  <!-- App styles -->
+  <link rel="stylesheet" href="styles.css" />
 
-// ---- Pulse overlay helpers (style-only) ----
-let pulseLayer = null;
-function ensurePulseLayer() {
-  if (!pulseLayer) {
-    pulseLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    pulseLayer.setAttribute("id", "pulseLayer");
-    svg.appendChild(pulseLayer);
-  }
-}
-function addPulseAtRect(rect, color = "rgba(16,185,129,.9)") {
-  ensurePulseLayer();
-  const x = parseFloat(rect.getAttribute("x")) || 0;
-  const y = parseFloat(rect.getAttribute("y")) || 0;
-  const w = parseFloat(rect.getAttribute("width")) || sectionSize;
-  const h = parseFloat(rect.getAttribute("height")) || sectionSize;
-  const cx = x + w/2, cy = y + h/2;
-
-  const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  ring.setAttribute("cx", cx);
-  ring.setAttribute("cy", cy);
-  ring.setAttribute("r", 2);
-  ring.setAttribute("class", "pulse-ring");
-  ring.setAttribute("fill", "none");
-  ring.setAttribute("stroke", color);
-  pulseLayer.appendChild(ring);
-
-  setTimeout(() => ring.remove(), 1200);
-}
-function redCenterPulse() {
-  ensurePulseLayer();
-  const vb = (svg.getAttribute("viewBox") || "0 0 530 550").split(" ").map(Number);
-  const cx = vb[2] / 2, cy = vb[3] / 2;
-  const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  circle.setAttribute("cx", cx);
-  circle.setAttribute("cy", cy);
-  circle.setAttribute("r", 0);
-  circle.setAttribute("fill", "none");
-  circle.setAttribute("stroke", "rgba(244,63,94,.85)");
-  circle.setAttribute("stroke-width", 2);
-  circle.style.animation = "pulseErrKf 0.9s ease-out 1";
-  pulseLayer.appendChild(circle);
-  setTimeout(() => circle.remove(), 900);
-}
-
-// ---- Draw map (unchanged) ----
-function drawSections() {
-  svg.innerHTML = "";
-  let index = 0;
-  for (let aisle in aisleConfig) {
-    const { front, back } = aisleConfig[aisle];
-    const x = offsetX + index++ * aisleSpacing;
-
-    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label.setAttribute("x", x + sectionSize);
-    label.setAttribute("y", 15);
-    label.setAttribute("class", "aisle-label");
-    label.textContent = aisle;
-    svg.appendChild(label);
-
-    for (let i = 0; i < front; i++) {
-      ["Left", "Right"].forEach((side, sIdx) => {
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIdx * (sectionSize + padding));
-        rect.setAttribute("y", 30 + i * (sectionSize + padding));
-        rect.setAttribute("width", sectionSize);
-        rect.setAttribute("height", sectionSize);
-        rect.setAttribute("class", "section");
-        rect.setAttribute("data-key", `${aisle}-BeforeWalkway-${side}-${i + 1}`);
-        svg.appendChild(rect);
-      });
+  <!-- Theme variables + pulse animations (additive; safe with styles.css) -->
+  <style>
+    :root{
+      --bg:#f4f4f4; --text:#111; --muted:#333; --card:#fff; --border:#ccc;
+      --found-bg:#e8f5e9; --found-left:#4caf50; --warn-bg:#fff3e0; --warn-left:#ff9800;
+      --map-line:red; --hi-fill:yellow; --hi-stroke:black;
+      --btn-bg:#fff; --btn-fg:#111; --btn-border:#ccc;
+    }
+    body.dark{
+      --bg:#0b1220; --text:#e8ecf2; --muted:#d5d8dd; --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.15);
+      --found-bg:rgba(16,185,129,.15); --found-left:#10b981; --warn-bg:rgba(245,158,11,.12); --warn-left:#f59e0b;
+      --map-line:rgba(56,189,248,.6); --hi-fill:rgba(110,231,183,.9); --hi-stroke:#fff;
+      --btn-bg:rgba(255,255,255,.06); --btn-fg:#e8ecf2; --btn-border:rgba(255,255,255,.18);
     }
 
-    for (let i = 0; i < back; i++) {
-      ["Left", "Right"].forEach((side, sIdx) => {
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", x + sIdx * (sectionSize + padding));
-        rect.setAttribute("y", 220 + i * (sectionSize + padding));
-        rect.setAttribute("width", sectionSize);
-        rect.setAttribute("height", sectionSize);
-        rect.setAttribute("class", "section");
-        rect.setAttribute("data-key", `${aisle}-AfterWalkway-${side}-${i + 1}`);
-        svg.appendChild(rect);
-      });
+    /* Small extras used by theme toggle & pulses */
+    .toolbar { display:inline-flex; gap:8px; align-items:center; margin-left: 8px; }
+    .btn {
+      display:inline-flex; align-items:center; gap:6px; padding:8px 12px; font-size:14px; border-radius:10px;
+      background:var(--btn-bg); color:var(--btn-fg); border:1px solid var(--btn-border); cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease;
     }
-  }
-  // recreate pulse layer on top
-  pulseLayer = null;
-  ensurePulseLayer();
-}
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,0,0,.12); }
+    @keyframes pulseRingKf{from{r:2;opacity:.9;stroke-width:2}to{r:18;opacity:0;stroke-width:0}}
+    @keyframes pulseErrKf{from{r:0;opacity:.35}to{r:180;opacity:0}}
+    .pulse-ring{fill:none;stroke:rgba(16,185,129,.9);animation:pulseRingKf 1.2s ease-out 1;pointer-events:none}
+    body.dark .highlight { filter: drop-shadow(0 0 6px rgba(16,185,129,.85)) drop-shadow(0 0 12px rgba(16,185,129,.55)); }
+  </style>
 
-// ---- Highlights (original + pulse) ----
-function clearHighlights() {
-  document.querySelectorAll(".section").forEach(el => el.classList.remove("highlight"));
-  if (pulseLayer) pulseLayer.innerHTML = "";
-}
-
-async function searchItems() {
-  const queries = searchBox.value
-    .trim()
-    .toUpperCase()
-    .split(",")
-    .map(q => q.trim())
-    .filter(q => q);
-
-  const res = await fetch("warehouse_inventory_map.csv");
-  const text = await res.text();
-  const rows = text.split("\n").slice(1);
-  const data = rows.map(r => {
-    const [code, aisle, level, block, side, section] = r.split(",").map(s => s.trim());
-    return { code, aisle, block, side, section };
-  });
-
-  clearHighlights();
-  document.getElementById("result").innerHTML = "";
-
-  let totalHighlights = 0;
-
-  queries.forEach(q => {
-    const matches = data.filter(r => r.code.toUpperCase() === q);
-
-    if (matches.length) {
-      const grouped = {};
-
-      matches.forEach(m => {
-        const { aisle, block, side, section } = m;
-        const groupKey = `${aisle}-${side}`;
-        if (!grouped[groupKey]) grouped[groupKey] = [];
-        grouped[groupKey].push(section);
-
-        const blockKey = block === "Before Walkway" ? "BeforeWalkway" : "AfterWalkway";
-
-        document
-          .querySelectorAll(`[data-key="${aisle}-${blockKey}-${side}-${Number(section)}"]`)
-          .forEach(el => {
-            el.classList.add("highlight");
-            addPulseAtRect(el);          // <- pulse ring on each highlight (style-only)
-            totalHighlights++;
-          });
-      });
-
-      for (let key in grouped) {
-        const [aisle, side] = key.split("-");
-        const sections = grouped[key].map(Number).sort((a, b) => a - b).join(", ");
-        const totalSections = grouped[key].length;
-        document.getElementById("result").innerHTML +=
-          `✅ <strong>${q}</strong><br>` +
-          `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>`;
-      }
-    } else {
-      document.getElementById("result").innerHTML +=
-        `⚠️ <strong>${q}</strong> - Item not found<br><br>`;
+  <!-- Keep your original inline layout styling (unchanged look by default) -->
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--text);
     }
-  });
+    .header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px; }
+    .header img { width: 70px; height: auto; border-radius: 8px; }
+    .header-title { font-size: 24px; font-weight: bold; color: var(--muted); }
+    .input-wrapper { position: relative; display: inline-flex; align-items:center; gap:8px; }
+    input[type="text"] {
+      padding: 10px; font-size: 16px; width: 80%; max-width: 300px; border-radius: 10px;
+      border: 1px solid var(--border); padding-right: 30px; background: var(--card); color: var(--text);
+    }
+    #clearBtn {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: #888; font-size: 18px; display: none;
+    }
+    #result { margin-top: 12px; font-size: 16px; font-weight: bold; color: #2e7d32; white-space: pre-line; }
+    .map-wrapper { overflow-x: auto; padding: 10px; margin-top: 20px; display: flex; justify-content: center; }
+    svg { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 10px;
+         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); max-width: 530px; width: 100%; height: auto; }
+    .section { fill: white; stroke: var(--map-line); stroke-width: 0.6; }
+    .highlight { fill: var(--hi-fill) !important; stroke: var(--hi-stroke); stroke-width: 1.5; }
+    .aisle-label { font-size: 11px; font-weight: bold; fill: var(--muted); }
 
-  // visual feedback if user typed something but nothing matched
-  if (queries.length > 0 && totalHighlights === 0) {
-    redCenterPulse();
-  }
-}
+    /* Feedback section (unchanged) */
+    .feedback-section { margin-top: 30px; text-align: center; }
+    .feedback-section textarea {
+      width: 70%; max-width: 300px; height: 60px; padding: 8px; font-size: 14px;
+      border: 1px solid var(--border); border-radius: 6px; resize: none; background: var(--card); color: var(--text);
+    }
+    .feedback-section button {
+      margin-top: 10px; padding: 10px 20px; background-color: #2e7d32; color: white;
+      border: none; border-radius: 6px; font-size: 16px; cursor: pointer;
+    }
+    .feedback-section button:hover { background-color: #27632a; }
+    #thankYouMessage { margin-top: 15px; font-size: 16px; color: #2e7d32; font-weight: bold; }
+    @media (max-width: 600px) {
+      .header-title { font-size: 20px; }
+      input[type="text"] { width: 90%; }
+    }
+  </style>
+</head>
+<body>
 
-// ---- Theme toggle (style-only) ----
-if (themeBtn) {
-  themeBtn.addEventListener("click", () => {
-    const isDark = document.body.classList.toggle("dark");
-    localStorage.setItem("wal-theme", isDark ? "dark" : "light");
-  });
-}
+  <div class="header">
+    <img src="your-logo.png" alt="Logo" />
+    <div class="header-title">Warehouse<br>Article Locator</div>
+  </div>
 
-// ---- Input events (unchanged) ----
-searchBox.addEventListener("input", () => {
-  if (searchBox.value.trim()) {
-    clearBtn.style.display = "inline";
-    searchItems();
-  } else {
-    clearBtn.style.display = "none";
-    clearHighlights();
-    document.getElementById("result").innerHTML = "";
-  }
-});
+  <p>Enter Item Code:</p>
 
-clearBtn.addEventListener("click", () => {
-  searchBox.value = "";
-  clearBtn.style.display = "none";
-  clearHighlights();
-  document.getElementById("result").innerHTML = "";
-});
+  <div class="input-wrapper">
+    <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
+    <span id="clearBtn">❌</span>
 
-// Initialize map
-drawSections();
+    <!-- NEW: Theme toggle button (style-only feature) -->
+    <span class="toolbar">
+      <button id="themeToggle" class="btn" title="Toggle theme">🌓 Theme</button>
+    </span>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="map-wrapper">
+    <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
+  </div>
+
+  <!-- Feedback Form Section (unchanged) -->
+  <div class="feedback-section">
+    <h3>📢 Suggest a Change / Request New Stock</h3>
+    <form id="feedbackForm" action="https://formsubmit.co/jatindhiman1991@hotmail.com" method="POST">
+      <textarea name="message" placeholder="Building from scratch! Tell us what’s broken or brilliant — let’s make it awesome! 💪" required></textarea><br>
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://gigtarget.github.io/NRTC-JD-v.2/">
+      <button type="submit">Submit Feedback</button>
+    </form>
+    <p id="thankYouMessage" style="display:none;">✅ Thank you! Your feedback has been submitted.</p>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Theme bootstrap: restore persisted theme early
+    (function(){
+      const saved = localStorage.getItem('wal-theme') || 'dark';
+      document.body.classList.toggle('dark', saved === 'dark');
+    })();
+  </script>
+</body>
+</html>
