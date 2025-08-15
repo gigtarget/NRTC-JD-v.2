@@ -46,8 +46,8 @@ function drawSections() {
         rect.setAttribute("y", 40 + i * (sectionSize + padding));
         rect.setAttribute("width", sectionSize);
         rect.setAttribute("height", sectionSize);
-        rect.setAttribute("rx", 7); // rounded corners (SVG attr)
-        rect.setAttribute("ry", 7);
+        rect.setAttribute("rx", 4); // rounded corners (SVG attr)
+        rect.setAttribute("ry", 4);
         rect.setAttribute("class", "section");
         rect.setAttribute("data-key", `${aisle}-BeforeWalkway-${side}-${i + 1}`);
         // compat keys (L/R) in case CSV uses letters
