@@ -1,9 +1,10 @@
-/* Reset */
+/* Base from your original, now theme-aware with CSS vars */
 body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f7fb;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .main-container {
@@ -16,22 +17,20 @@ h1 {
   text-align: center;
   font-size: 28px;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--muted);
 }
 
 /* Card Container */
 .card {
-  background: white;
+  background: var(--card);
   padding: 20px;
   border-radius: 16px;
+  border: 1px solid var(--border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Search */
-.search-wrapper {
-  margin-bottom: 15px;
-}
-
+.search-wrapper { margin-bottom: 15px; }
 .search-bar {
   background: #f0f2f5;
   border-radius: 12px;
@@ -40,19 +39,8 @@ h1 {
   padding: 10px 15px;
 }
 
-.search-icon {
-  font-size: 20px;
-  margin-right: 10px;
-  color: #888;
-}
-
-.clear-icon {
-  font-size: 18px;
-  margin-left: 8px;
-  color: #888;
-  cursor: pointer;
-  user-select: none;
-}
+.search-icon { font-size: 20px; margin-right: 10px; color: #888; }
+.clear-icon { font-size: 18px; margin-left: 8px; color: #888; cursor: pointer; user-select: none; }
 
 .search-bar input {
   border: none;
@@ -78,10 +66,8 @@ h1 {
   gap: 10px;
 }
 
-/* Force black color inside result */
-#result, #result * {
-  color: black !important;
-}
+/* Removed the old “force black” rule so dark theme looks correct */
+/* #result, #result * { color: black !important; } */
 
 .result-card {
   padding: 12px 15px;
@@ -89,50 +75,37 @@ h1 {
   font-size: 15px;
   font-weight: 500;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  background: var(--card);
+  border: 1px solid var(--border);
 }
 
 .result-card.found {
-  background: #e8f5e9;
-  border-left: 5px solid #4caf50;
+  background: var(--found-bg);
+  border-left: 5px solid var(--found-left);
 }
 
 .result-card.notfound {
-  background: #fff3e0;
-  border-left: 5px solid #ff9800;
+  background: var(--warn-bg);
+  border-left: 5px solid var(--warn-left);
 }
 
 /* Map */
 .map-wrapper {
   margin-top: 20px;
   padding: 10px;
-  background: #fafafa;
-  border: 1px solid #ddd;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
 }
 
-svg {
-  width: 100%;
-  height: auto;
-}
+svg { width: 100%; height: auto; }
 
-.section {
-  fill: white;
-  stroke: red;
-  stroke-width: 0.6;
-}
+.section { fill: white; stroke: var(--map-line); stroke-width: 0.6; }
 
-.highlight {
-  fill: yellow !important;
-  stroke: black;
-  stroke-width: 1.5;
-}
+.highlight { fill: var(--hi-fill) !important; stroke: var(--hi-stroke); stroke-width: 1.5; }
 
-.aisle-label {
-  font-size: 11px;
-  font-weight: bold;
-  fill: #444;
-}
+.aisle-label { font-size: 11px; font-weight: bold; fill: var(--muted); }
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
@@ -141,19 +114,10 @@ svg {
   75% { transform: translateX(-5px); }
 }
 
-.search-bar.shake {
-  animation: shake 0.4s;
-  border: 2px solid red;
-}
-
-.shake {
-  animation: shake 0.5s;
-  border: 2px solid red !important;
-}
+.search-bar.shake { animation: shake 0.4s; border: 2px solid red; }
+.shake { animation: shake 0.5s; border: 2px solid red !important; }
 
 /* Mobile Responsive */
 @media (max-width: 600px) {
-  h1 {
-    font-size: 24px;
-  }
+  h1 { font-size: 24px; }
 }
