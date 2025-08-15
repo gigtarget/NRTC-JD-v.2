@@ -135,8 +135,8 @@
   <script>
     // Theme bootstrap: restore persisted theme early
     (function(){
-      const saved = localStorage.getItem('wal-theme') || 'dark';
-      document.body.classList.toggle('dark', saved === 'dark');
+      const saved = localStorage.getItem('wal-theme') || 'light';
+      document.body.classList.toggle('dark', saved === 'light');
     })();
   </script>
 </body>
