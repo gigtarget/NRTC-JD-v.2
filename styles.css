@@ -1,4 +1,4 @@
-/* Base from your original, now theme-aware with CSS vars */
+/* Base (theme-aware) */
 body {
   margin: 0;
   padding: 0;
@@ -7,11 +7,7 @@ body {
   color: var(--text);
 }
 
-.main-container {
-  padding: 20px;
-  max-width: 600px;
-  margin: auto;
-}
+.main-container { padding: 20px; max-width: 600px; margin: auto; }
 
 h1 {
   text-align: center;
@@ -29,36 +25,7 @@ h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Search */
-.search-wrapper { margin-bottom: 15px; }
-.search-bar {
-  background: #f0f2f5;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  padding: 10px 15px;
-}
-
-.search-icon { font-size: 20px; margin-right: 10px; color: #888; }
-.clear-icon { font-size: 18px; margin-left: 8px; color: #888; cursor: pointer; user-select: none; }
-
-.search-bar input {
-  border: none;
-  outline: none;
-  background: none;
-  font-size: 16px;
-  width: 100%;
-}
-
-.hint {
-  font-size: 12px;
-  color: #777;
-  margin-top: 6px;
-  display: block;
-  text-align: center;
-}
-
-/* Result Cards */
+/* Result Cards (if you render custom ones later) */
 #result {
   margin-top: 15px;
   display: flex;
@@ -66,58 +33,46 @@ h1 {
   gap: 10px;
 }
 
-/* Removed the old “force black” rule so dark theme looks correct */
-/* #result, #result * { color: black !important; } */
-
 .result-card {
   padding: 12px 15px;
   border-radius: 10px;
   font-size: 15px;
   font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   background: var(--card);
   border: 1px solid var(--border);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.result-card.found {
-  background: var(--found-bg);
-  border-left: 5px solid var(--found-left);
-}
+.result-card.found { background: var(--found-bg); border-left: 5px solid var(--found-left); }
+.result-card.notfound { background: var(--warn-bg); border-left: 5px solid var(--warn-left); }
 
-.result-card.notfound {
-  background: var(--warn-bg);
-  border-left: 5px solid var(--warn-left);
-}
-
-/* Map */
+/* Map shell */
 .map-wrapper {
-  margin-top: 20px;
+  margin-top: 12px;
   padding: 10px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
 }
 
 svg { width: 100%; height: auto; }
 
-.section { fill: white; stroke: var(--map-line); stroke-width: 0.6; }
+/* Sections */
+.section { fill: #fff; stroke: var(--map-line); stroke-width: .9; }
+.highlight { fill: var(--hi-fill) !important; stroke: var(--hi-stroke); stroke-width: 1.4; }
+.aisle-label { font-size: 13px; font-weight: 800; fill: var(--muted); }
 
-.highlight { fill: var(--hi-fill) !important; stroke: var(--hi-stroke); stroke-width: 1.5; }
-
-.aisle-label { font-size: 11px; font-weight: bold; fill: var(--muted); }
-
+/* Small shake utility retained */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
   50% { transform: translateX(5px); }
   75% { transform: translateX(-5px); }
 }
-
-.search-bar.shake { animation: shake 0.4s; border: 2px solid red; }
 .shake { animation: shake 0.5s; border: 2px solid red !important; }
 
-/* Mobile Responsive */
-@media (max-width: 600px) {
+/* Mobile */
+@media (max-width: 720px) {
   h1 { font-size: 24px; }
 }
