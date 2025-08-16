@@ -189,12 +189,18 @@ async function searchItems() {
         const [aisle, side] = key.split("-");
         const sections = grouped[key].sort((a, b) => a - b).join(", ");
         const totalSections = grouped[key].length;
-        resultBox.innerHTML +=
+        const card = document.createElement("div");
+        card.className = "result-card found";
+        card.innerHTML =
           `✅ <strong>${q}</strong><br>` +
-          `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>`;
+          `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})`;
+        resultBox.appendChild(card);
       }
     } else {
-      resultBox.innerHTML += `⚠️ <strong>${q}</strong> - Item not found<br><br>`;
+      const card = document.createElement("div");
+      card.className = "result-card notfound";
+      card.innerHTML = `⚠️ <strong>${q}</strong> - Item not found`;
+      resultBox.appendChild(card);
     }
   });
 
