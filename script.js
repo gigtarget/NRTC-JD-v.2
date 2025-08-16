@@ -43,6 +43,14 @@ async function loadInventoryData() {
       })
       .filter(Boolean);
     allCodes = [...new Set(inventoryData.map(r => r.code))].sort();
+    const dl = document.getElementById("itemSuggestions");
+    dl.innerHTML = "";
+    allCodes.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      dl.appendChild(opt);
+    });
+    
   } catch {
     inventoryData = [];
     allCodes = [];
@@ -267,6 +275,19 @@ searchBox.addEventListener("keydown", e => {
     }
     document.getElementById("suggestions").style.display = "none";
     searchItems();
+  }
+});
+searchBox.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    const val = searchBox.value.trim().toUpperCase();
+    if (!allCodes.includes(val)) {
+      const suggestion = allCodes.find(code => code.startsWith(val));
+      if (suggestion) {
+        e.preventDefault();
+        searchBox.value = suggestion;
+        searchItems();
+      }
+    }
   }
 });
 clearBtn.addEventListener("click", () => {
