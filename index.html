@@ -69,9 +69,21 @@
       cursor: pointer; color: #c26c6c; font-size: 20px; display: none;
     }
 
-    #result { margin-top: 12px; font-size: 16px; font-weight: bold; color: #2e7d32; white-space: pre-line; }
+    #result {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
 
-    .map-wrapper { overflow-x: auto; padding: 10px; margin-top: 16px; display: flex; justify-content: center; }
+    .map-wrapper {
+      overflow: auto;
+      padding: 10px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+    }
     svg {
       background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); max-width: 530px; width: 100%; height: auto; /* original ratio */
@@ -81,6 +93,27 @@
     .aisle-label { font-size: 11px; font-weight: bold; fill: var(--muted); }
 
     .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    .suggestions div {
+      padding: 8px 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .suggestions div:hover { background: var(--found-bg); }
 
     /* Feedback section (unchanged) */
     .feedback-section { margin-top: 30px; text-align: center; }
@@ -105,8 +138,9 @@
 
   <div class="controls">
     <div class="input-wrapper">
-      <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" />
+      <input id="searchBox" type="text" placeholder="e.g. LCQ, ANC, AGDT" autocomplete="off" />
       <span id="clearBtn">❌</span>
+      <div id="suggestions" class="suggestions"></div>
     </div>
     <!-- Theme toggle outside the input wrapper (no overlap) -->
     <div class="toolbar">

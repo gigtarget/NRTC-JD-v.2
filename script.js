@@ -23,8 +23,55 @@ const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 const themeBtn = document.getElementById("themeToggle");
 
+let inventoryData = [];
+let allCodes = [];
+
 const totalAisles = Object.keys(aisleConfig).length;
 svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
+
+async function loadInventoryData() {
+  try {
+    const res = await fetch("warehouse_inventory_map.csv", { cache: "no-store" });
+    const text = await res.text();
+    const rows = text.split("\n").slice(1);
+    inventoryData = rows
+      .map(r => {
+        const parts = r.split(",").map(s => (s ? s.trim() : ""));
+        if (parts.length < 6) return null;
+        const [code, aisle, level, block, side, section] = parts;
+        return { code, aisle, block, side, section };
+      })
+      .filter(Boolean);
+    allCodes = [...new Set(inventoryData.map(r => r.code))].sort();
+  } catch {
+    inventoryData = [];
+    allCodes = [];
+  }
+}
+
+function updateSuggestions() {
+  const term = searchBox.value.split(/[^A-Z0-9]+/g).pop().toUpperCase();
+  const box = document.getElementById("suggestions");
+  box.innerHTML = "";
+  if (!term) { box.style.display = "none"; return; }
+  const matches = allCodes.filter(code => code.startsWith(term));
+  if (!matches.length) { box.style.display = "none"; return; }
+  matches.slice(0, 10).forEach(code => {
+    const div = document.createElement("div");
+    div.textContent = code;
+    div.addEventListener("mousedown", () => {
+      const raw = searchBox.value;
+      const upperRaw = raw.toUpperCase();
+      const idx = upperRaw.lastIndexOf(term);
+      const prefix = raw.slice(0, idx);
+      searchBox.value = prefix + code;
+      box.style.display = "none";
+      searchItems();
+    });
+    box.appendChild(div);
+  });
+  box.style.display = "block";
+}
 
 // ---- Pulse overlay helpers (visual only) ----
 let pulseLayer = null;
@@ -135,23 +182,7 @@ async function searchItems() {
     .map(q => q.trim())
     .filter(q => q);
 
-  let text = "";
-  try {
-    const res = await fetch("warehouse_inventory_map.csv", { cache: "no-store" });
-    text = await res.text();
-  } catch {
-    text = "Item Code,Aisle,Level,Block,Side,Section\n"; // no data fallback
-  }
-
-  const rows = text.split("\n").slice(1);
-  const data = rows
-    .map(r => {
-      const parts = r.split(",").map(s => (s ? s.trim() : ""));
-      if (parts.length < 6) return null;
-      const [code, aisle, level, block, side, section] = parts;
-      return { code, aisle, block, side, section };
-    })
-    .filter(Boolean);
+  const data = inventoryData;
 
   clearHighlights();
   const resultBox = document.getElementById("result");
@@ -189,12 +220,18 @@ async function searchItems() {
         const [aisle, side] = key.split("-");
         const sections = grouped[key].sort((a, b) => a - b).join(", ");
         const totalSections = grouped[key].length;
-        resultBox.innerHTML +=
+        const card = document.createElement("div");
+        card.className = "result-card found";
+        card.innerHTML =
           `✅ <strong>${q}</strong><br>` +
-          `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})<br><br>`;
+          `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})`;
+        resultBox.appendChild(card);
       }
     } else {
-      resultBox.innerHTML += `⚠️ <strong>${q}</strong> - Item not found<br><br>`;
+      const card = document.createElement("div");
+      card.className = "result-card notfound";
+      card.innerHTML = `⚠️ <strong>${q}</strong> - Item not found`;
+      resultBox.appendChild(card);
     }
   });
 
@@ -207,11 +244,29 @@ async function searchItems() {
 searchBox.addEventListener("input", () => {
   if (searchBox.value.trim()) {
     clearBtn.style.display = "inline";
-    searchItems();
   } else {
     clearBtn.style.display = "none";
     clearHighlights();
     document.getElementById("result").innerHTML = "";
+  }
+  updateSuggestions();
+});
+searchBox.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const term = searchBox.value.split(/[^A-Z0-9]+/g).pop().toUpperCase();
+    if (term && !allCodes.includes(term)) {
+      const suggestion = allCodes.find(code => code.startsWith(term));
+      if (suggestion) {
+        const raw = searchBox.value;
+        const upperRaw = raw.toUpperCase();
+        const idx = upperRaw.lastIndexOf(term);
+        const prefix = raw.slice(0, idx);
+        searchBox.value = prefix + suggestion;
+      }
+    }
+    document.getElementById("suggestions").style.display = "none";
+    searchItems();
   }
 });
 clearBtn.addEventListener("click", () => {
@@ -219,6 +274,14 @@ clearBtn.addEventListener("click", () => {
   clearBtn.style.display = "none";
   clearHighlights();
   document.getElementById("result").innerHTML = "";
+  document.getElementById("suggestions").style.display = "none";
+});
+
+document.addEventListener("click", e => {
+  const wrapper = document.querySelector(".input-wrapper");
+  if (wrapper && !wrapper.contains(e.target)) {
+    document.getElementById("suggestions").style.display = "none";
+  }
 });
 
 // Theme toggle (style-only)
@@ -231,3 +294,4 @@ if (themeBtn) {
 
 // Init
 drawSections();
+loadInventoryData();
