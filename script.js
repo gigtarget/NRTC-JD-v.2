@@ -174,22 +174,19 @@ async function searchItems() {
   let totalHighlights = 0;
 
   queries.forEach(q => {
-    const matches = data.filter(r => r.code && r.code.toUpperCase() === q);
+    const matches = data.filter(r => r.code && r.code.toUpperCase().startsWith(q));
 
     if (matches.length) {
-      const grouped = {};
+      const byCode = {};
       matches.forEach(m => {
-        const { aisle, block, side, section } = m;
-        const groupKey = `${aisle}-${side}`;
-        if (!grouped[groupKey]) grouped[groupKey] = [];
-        grouped[groupKey].push(Number(section));
+        const code = m.code.toUpperCase();
+        if (!byCode[code]) byCode[code] = [];
+        byCode[code].push(m);
 
-        const blockKey = block === "Before Walkway" ? "BeforeWalkway" : "AfterWalkway";
-
-        // Support Left/Right and L/R keys
+        const blockKey = m.block === "Before Walkway" ? "BeforeWalkway" : "AfterWalkway";
         const sel = [
-          `[data-key="${aisle}-${blockKey}-${side}-${Number(section)}"]`,
-          `[data-key-short="${aisle}-${blockKey}-${side}-${Number(section)}"]`,
+          `[data-key="${m.aisle}-${blockKey}-${m.side}-${Number(m.section)}"]`,
+          `[data-key-short="${m.aisle}-${blockKey}-${m.side}-${Number(m.section)}"]`,
         ].join(",");
 
         document.querySelectorAll(sel).forEach(el => {
@@ -199,17 +196,27 @@ async function searchItems() {
         });
       });
 
-      for (let key in grouped) {
-        const [aisle, side] = key.split("-");
-        const sections = grouped[key].sort((a, b) => a - b).join(", ");
-        const totalSections = grouped[key].length;
-        const card = document.createElement("div");
-        card.className = "result-card found";
-        card.innerHTML =
-          `✅ <strong>${q}</strong><br>` +
-          `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})`;
-        resultBox.appendChild(card);
-      }
+      Object.keys(byCode).forEach(code => {
+        const grouped = {};
+        byCode[code].forEach(m => {
+          const { aisle, side, section } = m;
+          const groupKey = `${aisle}-${side}`;
+          if (!grouped[groupKey]) grouped[groupKey] = [];
+          grouped[groupKey].push(Number(section));
+        });
+
+        for (let key in grouped) {
+          const [aisle, side] = key.split("-");
+          const sections = grouped[key].sort((a, b) => a - b).join(", ");
+          const totalSections = grouped[key].length;
+          const card = document.createElement("div");
+          card.className = "result-card found";
+          card.innerHTML =
+            `✅ <strong>${code}</strong><br>` +
+            `➔ Aisle: <b>${aisle}</b> | Side: ${side} | Sections: ${sections} (Total: ${totalSections})`;
+          resultBox.appendChild(card);
+        }
+      });
     } else {
       const card = document.createElement("div");
       card.className = "result-card notfound";
