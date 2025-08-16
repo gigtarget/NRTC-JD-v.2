@@ -23,8 +23,38 @@ const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 const themeBtn = document.getElementById("themeToggle");
 
+let inventoryData = [];
+let allCodes = [];
+
 const totalAisles = Object.keys(aisleConfig).length;
 svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
+
+async function loadInventoryData() {
+  try {
+    const res = await fetch("warehouse_inventory_map.csv", { cache: "no-store" });
+    const text = await res.text();
+    const rows = text.split("\n").slice(1);
+    inventoryData = rows
+      .map(r => {
+        const parts = r.split(",").map(s => (s ? s.trim() : ""));
+        if (parts.length < 6) return null;
+        const [code, aisle, level, block, side, section] = parts;
+        return { code, aisle, block, side, section };
+      })
+      .filter(Boolean);
+    allCodes = [...new Set(inventoryData.map(r => r.code))].sort();
+    const dl = document.getElementById("itemSuggestions");
+    dl.innerHTML = "";
+    allCodes.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      dl.appendChild(opt);
+    });
+  } catch {
+    inventoryData = [];
+    allCodes = [];
+  }
+}
 
 // ---- Pulse overlay helpers (visual only) ----
 let pulseLayer = null;
@@ -135,23 +165,7 @@ async function searchItems() {
     .map(q => q.trim())
     .filter(q => q);
 
-  let text = "";
-  try {
-    const res = await fetch("warehouse_inventory_map.csv", { cache: "no-store" });
-    text = await res.text();
-  } catch {
-    text = "Item Code,Aisle,Level,Block,Side,Section\n"; // no data fallback
-  }
-
-  const rows = text.split("\n").slice(1);
-  const data = rows
-    .map(r => {
-      const parts = r.split(",").map(s => (s ? s.trim() : ""));
-      if (parts.length < 6) return null;
-      const [code, aisle, level, block, side, section] = parts;
-      return { code, aisle, block, side, section };
-    })
-    .filter(Boolean);
+  const data = inventoryData;
 
   clearHighlights();
   const resultBox = document.getElementById("result");
@@ -220,6 +234,19 @@ searchBox.addEventListener("input", () => {
     document.getElementById("result").innerHTML = "";
   }
 });
+searchBox.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    const val = searchBox.value.trim().toUpperCase();
+    if (!allCodes.includes(val)) {
+      const suggestion = allCodes.find(code => code.startsWith(val));
+      if (suggestion) {
+        e.preventDefault();
+        searchBox.value = suggestion;
+        searchItems();
+      }
+    }
+  }
+});
 clearBtn.addEventListener("click", () => {
   searchBox.value = "";
   clearBtn.style.display = "none";
@@ -237,3 +264,4 @@ if (themeBtn) {
 
 // Init
 drawSections();
+loadInventoryData();
