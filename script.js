@@ -27,10 +27,7 @@ let inventoryData = [];
 let allCodes = [];
 
 const totalAisles = Object.keys(aisleConfig).length;
-const maxBack = Math.max(...Object.values(aisleConfig).map(a => a.back));
-const hoopingStartY = backStartY + maxBack * (sectionSize + padding) + 40;
-// extend viewBox height to fit extra bottom row
-svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} ${hoopingStartY + sectionSize + 40}`);
+svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
 
 async function loadInventoryData() {
   try {
@@ -150,31 +147,6 @@ function drawSections() {
       });
     }
   }
-
-  // Extra bottom row: Hooping Station
-  const hsLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  hsLabel.setAttribute("x", offsetX);
-  hsLabel.setAttribute("y", hoopingStartY + sectionSize - 4);
-  hsLabel.setAttribute("class", "aisle-label");
-  hsLabel.textContent = "Hooping Station";
-  svg.appendChild(hsLabel);
-
-  const hsStartX = offsetX + 110; // leave space for label
-  const hsSections = 6;
-  for (let i = 0; i < hsSections; i++) {
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", hsStartX + i * (sectionSize + padding));
-    rect.setAttribute("y", hoopingStartY);
-    rect.setAttribute("width", sectionSize);
-    rect.setAttribute("height", sectionSize);
-    rect.setAttribute("rx", 4);
-    rect.setAttribute("ry", 4);
-    rect.setAttribute("class", "section");
-    rect.setAttribute("data-key", `HS-AfterWalkway-Left-${i + 1}`);
-    rect.setAttribute("data-key-short", `HS-AfterWalkway-L-${i + 1}`);
-    svg.appendChild(rect);
-  }
-
   pulseLayer = null; // keep pulses above
   ensurePulseLayer();
 }
