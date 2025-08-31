@@ -12,10 +12,8 @@ const aisleConfig = {
 };
 
 const aisleSpacing = 55;
-const sectionSize = 20; // width/height of individual blocks
-const padding = 2; // general gap used in aisle layout
-// spacing between Hooping Station blocks; adjust to increase gap
-const hoopingPadding = 6;
+const sectionSize = 20;
+const padding = 2;
 const offsetX = 10;
 const topFrontY = 30;
 const backStartY = 220;
@@ -186,17 +184,17 @@ function drawSections() {
   const hsStartX = offsetX + 110; // leave space for label
   const hsSections = 6;
   for (let i = 0; i < hsSections; i++) {
-    addHsSection(hsStartX + i * (sectionSize + hoopingPadding));
+    addHsSection(hsStartX + i * (sectionSize + padding));
   }
 
   // first 3 small blocks
   for (let i = 0; i < 3; i++) {
     addHsSection(hsX);
-    hsX += sectionSize + hoopingPadding;
+    hsX += sectionSize + padding;
   }
 
   // big hooping station block
-  const bigWidth = (sectionSize + hoopingPadding) * 4 - hoopingPadding;
+  const bigWidth = (sectionSize + padding) * 4 - padding;
   const bigRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   bigRect.setAttribute("x", hsX);
   bigRect.setAttribute("y", hoopingStartY);
@@ -216,12 +214,12 @@ function drawSections() {
   hsText.textContent = "Hooping Station";
   svg.appendChild(hsText);
 
-  hsX += bigWidth + hoopingPadding;
+  hsX += bigWidth + padding;
 
   // next 3 small blocks
   for (let i = 0; i < 3; i++) {
     addHsSection(hsX);
-    hsX += sectionSize + hoopingPadding;
+    hsX += sectionSize + padding;
   }
 
   // final single block
