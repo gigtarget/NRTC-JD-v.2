@@ -154,6 +154,12 @@ function drawSections() {
     }
   }
 
+  // Extra bottom row: Hooping Station block + surrounding sections
+  let hsX = offsetX;
+  let hsIndex = 1;
+  const addHsSection = x => {
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", x);
   // Extra bottom row: Hooping Station
   const hsLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
   hsLabel.setAttribute("x", offsetX);
@@ -173,6 +179,50 @@ function drawSections() {
     rect.setAttribute("rx", 4);
     rect.setAttribute("ry", 4);
     rect.setAttribute("class", "section");
+    rect.setAttribute("data-key", `HS-AfterWalkway-Left-${hsIndex}`);
+    rect.setAttribute("data-key-short", `HS-AfterWalkway-L-${hsIndex}`);
+    svg.appendChild(rect);
+    hsIndex++;
+  };
+
+  // first 3 small blocks
+  for (let i = 0; i < 3; i++) {
+    addHsSection(hsX);
+    hsX += sectionSize + padding;
+  }
+
+  // big hooping station block
+  const bigWidth = (sectionSize + padding) * 4 - padding;
+  const bigRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bigRect.setAttribute("x", hsX);
+  bigRect.setAttribute("y", hoopingStartY);
+  bigRect.setAttribute("width", bigWidth);
+  bigRect.setAttribute("height", sectionSize);
+  bigRect.setAttribute("rx", 4);
+  bigRect.setAttribute("ry", 4);
+  bigRect.setAttribute("class", "hooping-block");
+  svg.appendChild(bigRect);
+
+  const hsText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  hsText.setAttribute("x", hsX + bigWidth / 2);
+  hsText.setAttribute("y", hoopingStartY + sectionSize / 2);
+  hsText.setAttribute("class", "hooping-text");
+  hsText.setAttribute("text-anchor", "middle");
+  hsText.setAttribute("dominant-baseline", "middle");
+  hsText.textContent = "Hooping Station";
+  svg.appendChild(hsText);
+
+  hsX += bigWidth + padding;
+
+  // next 3 small blocks
+  for (let i = 0; i < 3; i++) {
+    addHsSection(hsX);
+    hsX += sectionSize + padding;
+  }
+
+  // final single block
+  addHsSection(hsX);
+
     rect.setAttribute("data-key", `HS-AfterWalkway-Left-${i + 1}`);
     rect.setAttribute("data-key-short", `HS-AfterWalkway-L-${i + 1}`);
     svg.appendChild(rect);
