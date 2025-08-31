@@ -27,7 +27,13 @@ let inventoryData = [];
 let allCodes = [];
 
 const totalAisles = Object.keys(aisleConfig).length;
-svg.setAttribute("viewBox", `0 0 ${totalAisles * aisleSpacing} 550`);
+const maxBack = Math.max(...Object.values(aisleConfig).map(a => a.back));
+const hoopingStartY = backStartY + maxBack * (sectionSize + padding) + 40;
+// extend viewBox and explicit height so extra bottom row is visible
+const viewWidth = totalAisles * aisleSpacing;
+const viewHeight = hoopingStartY + sectionSize + 40;
+svg.setAttribute("viewBox", `0 0 ${viewWidth} ${viewHeight}`);
+svg.style.height = `${viewHeight}px`;
 
 async function loadInventoryData() {
   try {
@@ -147,6 +153,63 @@ function drawSections() {
       });
     }
   }
+
+  // Extra bottom row: Hooping Station block + surrounding sections
+  let hsX = offsetX;
+  let hsIndex = 1;
+  const addHsSection = x => {
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", x);
+    rect.setAttribute("y", hoopingStartY);
+    rect.setAttribute("width", sectionSize);
+    rect.setAttribute("height", sectionSize);
+    rect.setAttribute("rx", 4);
+    rect.setAttribute("ry", 4);
+    rect.setAttribute("class", "section");
+    rect.setAttribute("data-key", `HS-AfterWalkway-Left-${hsIndex}`);
+    rect.setAttribute("data-key-short", `HS-AfterWalkway-L-${hsIndex}`);
+    svg.appendChild(rect);
+    hsIndex++;
+  };
+
+  // first 3 small blocks
+  for (let i = 0; i < 3; i++) {
+    addHsSection(hsX);
+    hsX += sectionSize + padding;
+  }
+
+  // big hooping station block
+  const bigWidth = (sectionSize + padding) * 4 - padding;
+  const bigRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bigRect.setAttribute("x", hsX);
+  bigRect.setAttribute("y", hoopingStartY);
+  bigRect.setAttribute("width", bigWidth);
+  bigRect.setAttribute("height", sectionSize);
+  bigRect.setAttribute("rx", 4);
+  bigRect.setAttribute("ry", 4);
+  bigRect.setAttribute("class", "hooping-block");
+  svg.appendChild(bigRect);
+
+  const hsText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  hsText.setAttribute("x", hsX + bigWidth / 2);
+  hsText.setAttribute("y", hoopingStartY + sectionSize / 2);
+  hsText.setAttribute("class", "hooping-text");
+  hsText.setAttribute("text-anchor", "middle");
+  hsText.setAttribute("dominant-baseline", "middle");
+  hsText.textContent = "Hooping Station";
+  svg.appendChild(hsText);
+
+  hsX += bigWidth + padding;
+
+  // next 3 small blocks
+  for (let i = 0; i < 3; i++) {
+    addHsSection(hsX);
+    hsX += sectionSize + padding;
+  }
+
+  // final single block
+  addHsSection(hsX);
+
   pulseLayer = null; // keep pulses above
   ensurePulseLayer();
 }
