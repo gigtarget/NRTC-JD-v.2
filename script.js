@@ -160,6 +160,20 @@ function drawSections() {
   const addHsSection = x => {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("x", x);
+    
+  // Extra bottom row: Hooping Station
+  const hsLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  hsLabel.setAttribute("x", offsetX);
+  hsLabel.setAttribute("y", hoopingStartY + sectionSize - 4);
+  hsLabel.setAttribute("class", "aisle-label");
+  hsLabel.textContent = "Hooping Station";
+  svg.appendChild(hsLabel);
+
+  const hsStartX = offsetX + 110; // leave space for label
+  const hsSections = 6;
+  for (let i = 0; i < hsSections; i++) {
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", hsStartX + i * (sectionSize + padding));
     rect.setAttribute("y", hoopingStartY);
     rect.setAttribute("width", sectionSize);
     rect.setAttribute("height", sectionSize);
@@ -209,6 +223,11 @@ function drawSections() {
 
   // final single block
   addHsSection(hsX);
+
+    rect.setAttribute("data-key", `HS-AfterWalkway-Left-${i + 1}`);
+    rect.setAttribute("data-key-short", `HS-AfterWalkway-L-${i + 1}`);
+    svg.appendChild(rect);
+  }
 
   pulseLayer = null; // keep pulses above
   ensurePulseLayer();
