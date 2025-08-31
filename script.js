@@ -160,6 +160,7 @@ function drawSections() {
   const addHsSection = x => {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("x", x);
+    
   // Extra bottom row: Hooping Station
   const hsLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
   hsLabel.setAttribute("x", offsetX);
