@@ -170,19 +170,22 @@ function drawSections() {
     rect.setAttribute("rx", 4);
     rect.setAttribute("ry", 4);
     rect.setAttribute("class", "section");
-    rect.setAttribute("data-key", `J-AfterWalkway-Left-${jIndex}`);
-    rect.setAttribute("data-key-short", `J-AfterWalkway-L-${jIndex}`);
+    rect.setAttribute("data-key", `J-AfterWalkway-Right-${jIndex}`);
+    rect.setAttribute("data-key-short", `J-AfterWalkway-R-${jIndex}`);
     svg.appendChild(rect);
+
+    // numeric labels so sections can be visually identified and searched
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("x", x + sectionSize / 2);
+    t.setAttribute("y", hoopingStartY + sectionSize / 2);
+    t.setAttribute("class", "section-label");
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("dominant-baseline", "middle");
+    t.textContent = `J${jIndex}`;
+    svg.appendChild(t);
+
     jIndex++;
   };
-
-  // Label for aisle J
-  const jLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  jLabel.setAttribute("x", offsetX);
-  jLabel.setAttribute("y", hoopingStartY + sectionSize - 4);
-  jLabel.setAttribute("class", "aisle-label");
-  jLabel.textContent = "J";
-  svg.appendChild(jLabel);
 
   // Group 1 (A-Left, A-Right, B-Left)
   [["A",0],["A",1],["B",0]].forEach(([a,s]) => addJSection(colX(a,s)));
