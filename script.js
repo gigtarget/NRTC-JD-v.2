@@ -17,6 +17,7 @@ const padding = 2;
 const offsetX = 10;
 const topFrontY = 30;
 const backStartY = 220;
+const jGroupGap = 24;
 
 const svg = document.getElementById("aisles");
 const searchBox = document.getElementById("searchBox");
@@ -137,7 +138,7 @@ function drawSections() {
     }
 
     // Bottom (After Walkway)
-    for (let i = 0; i < back; i++) {
+  for (let i = 0; i < back; i++) {
       ["Left", "Right"].forEach((side, sIdx) => {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("x", x + sIdx * (sectionSize + padding));
@@ -154,10 +155,13 @@ function drawSections() {
     }
   }
 
-  // Extra bottom row: Hooping Station block + surrounding sections
-  let hsX = offsetX;
-  let hsIndex = 1;
-  const addHsSection = x => {
+  // Bottom row: aisle J with Hooping Station
+  const colX = (aisleLetter, sideIdx = 0) => {
+    const idx = "ABCDEFGHI".indexOf(aisleLetter);
+    return offsetX + idx * aisleSpacing + sideIdx * (sectionSize + padding);
+  };
+  let jIndex = 1;
+  const addJSection = x => {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     rect.setAttribute("x", x);
     rect.setAttribute("y", hoopingStartY);
@@ -166,37 +170,38 @@ function drawSections() {
     rect.setAttribute("rx", 4);
     rect.setAttribute("ry", 4);
     rect.setAttribute("class", "section");
-    rect.setAttribute("data-key", `HS-AfterWalkway-Left-${hsIndex}`);
-    rect.setAttribute("data-key-short", `HS-AfterWalkway-L-${hsIndex}`);
+    rect.setAttribute("data-key", `J-AfterWalkway-Right-${jIndex}`);
+    rect.setAttribute("data-key-short", `J-AfterWalkway-R-${jIndex}`);
     svg.appendChild(rect);
-    hsIndex++;
+
+    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txt.setAttribute("x", x + sectionSize / 2);
+    txt.setAttribute("y", hoopingStartY + sectionSize / 2);
+    txt.setAttribute("class", "section-label");
+    txt.setAttribute("text-anchor", "middle");
+    txt.setAttribute("dominant-baseline", "middle");
+    txt.textContent = `J${jIndex}`;
+    svg.appendChild(txt);
+
+    jIndex++;
   };
 
-  // Hooping Station label
-  const hsLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  hsLabel.setAttribute("x", offsetX);
-  hsLabel.setAttribute("y", hoopingStartY + sectionSize - 4);
-  hsLabel.setAttribute("class", "aisle-label");
-  hsLabel.textContent = "Hooping Station";
-  svg.appendChild(hsLabel);
+  // Label for aisle J
+  const jLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  jLabel.setAttribute("x", offsetX);
+  jLabel.setAttribute("y", hoopingStartY + sectionSize - 4);
+  jLabel.setAttribute("class", "aisle-label");
+  jLabel.textContent = "J";
+  svg.appendChild(jLabel);
 
-  // Fixed six Hooping Station sections
-  const hsStartX = offsetX + 110; // leave space for label
-  const hsSections = 6;
-  for (let i = 0; i < hsSections; i++) {
-    addHsSection(hsStartX + i * (sectionSize + padding));
-  }
+  // Group 1 (A-Left, A-Right, B-Left)
+  [["A",0],["A",1],["B",0]].forEach(([a,s]) => addJSection(colX(a,s)));
 
-  // first 3 small blocks
-  for (let i = 0; i < 3; i++) {
-    addHsSection(hsX);
-    hsX += sectionSize + padding;
-  }
-
-  // big hooping station block
-  const bigWidth = (sectionSize + padding) * 4 - padding;
+  // Group 2: Hooping Station block spanning C-left..D-right
+  const bigX = colX("C",0);
+  const bigWidth = colX("E",0) - bigX - jGroupGap; // span C-left..D-right
   const bigRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  bigRect.setAttribute("x", hsX);
+  bigRect.setAttribute("x", bigX);
   bigRect.setAttribute("y", hoopingStartY);
   bigRect.setAttribute("width", bigWidth);
   bigRect.setAttribute("height", sectionSize);
@@ -204,9 +209,8 @@ function drawSections() {
   bigRect.setAttribute("ry", 4);
   bigRect.setAttribute("class", "hooping-block");
   svg.appendChild(bigRect);
-
   const hsText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  hsText.setAttribute("x", hsX + bigWidth / 2);
+  hsText.setAttribute("x", bigX + bigWidth / 2);
   hsText.setAttribute("y", hoopingStartY + sectionSize / 2);
   hsText.setAttribute("class", "hooping-text");
   hsText.setAttribute("text-anchor", "middle");
@@ -214,16 +218,11 @@ function drawSections() {
   hsText.textContent = "Hooping Station";
   svg.appendChild(hsText);
 
-  hsX += bigWidth + padding;
+  // Group 3 (E-Left, E-Right, F-Left)
+  [["E",0],["E",1],["F",0]].forEach(([a,s]) => addJSection(colX(a,s)));
 
-  // next 3 small blocks
-  for (let i = 0; i < 3; i++) {
-    addHsSection(hsX);
-    hsX += sectionSize + padding;
-  }
-
-  // final single block
-  addHsSection(hsX);
+  // Group 4 (H-Left)
+  addJSection(colX("H",0));
 
   pulseLayer = null; // keep pulses above
   ensurePulseLayer();
