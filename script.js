@@ -30,11 +30,11 @@ let allCodes = [];
 const totalAisles = Object.keys(aisleConfig).length;
 const maxBack = Math.max(...Object.values(aisleConfig).map(a => a.back));
 const hoopingStartY = backStartY + maxBack * (sectionSize + padding) + 40;
-// extend viewBox and explicit height so extra bottom row is visible
+// extend viewBox so extra bottom row is visible
 const viewWidth = totalAisles * aisleSpacing;
 const viewHeight = hoopingStartY + sectionSize + 40;
 svg.setAttribute("viewBox", `0 0 ${viewWidth} ${viewHeight}`);
-svg.style.height = `${viewHeight}px`;
+// rely on CSS for height to avoid extra whitespace
 
 async function loadInventoryData() {
   try {
