@@ -109,6 +109,49 @@
     }
     .feedback-section button:hover { background-color: #27632a; }
     #thankYouMessage { margin-top: 15px; font-size: 16px; color: #2e7d32; font-weight: bold; }
+
+    /* Feature popup */
+    .feature-popup {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      max-width: 260px;
+      padding: 15px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: left;
+      z-index: 1000;
+    }
+    .feature-popup.hidden { display: none; }
+    .feature-popup h3 { margin-top: 0; font-size: 16px; color: var(--muted); }
+    .feature-popup ul { padding-left: 20px; margin: 10px 0; }
+    .feature-popup li { margin-bottom: 6px; font-size: 14px; }
+    .feature-popup .popup-close {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    /* Update timeline */
+    .update-timeline {
+      margin-top: 40px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .update-timeline h3 { text-align: center; }
+    .update-timeline ul { padding-left: 20px; }
+    .update-timeline li { margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -116,6 +159,17 @@
   <div class="header">
     <img src="your-logo.png" alt="Logo" />
     <div class="header-title">Warehouse<br>Article Locator</div>
+  </div>
+
+  <div id="feature-popup" class="feature-popup hidden">
+    <button id="feature-popup-close" class="popup-close" aria-label="Close">&times;</button>
+    <h3>What's New</h3>
+    <ul>
+      <li>🌙 Dark mode — toggle at the top.</li>
+      <li>🔍 Advanced search shows results as you type.</li>
+      <li>🗺️ Coming soon: hat section J back of the warehouse.</li>
+    </ul>
+    <button id="feature-popup-dismiss" class="btn">Don't show again</button>
   </div>
 
   <div class="controls">
@@ -138,6 +192,15 @@
     <svg id="aisles" preserveAspectRatio="xMinYMin meet"></svg>
   </div>
 
+  <div class="update-timeline">
+    <h3>Site Updates</h3>
+    <ul>
+      <li><strong>Jul 2024:</strong> Added dark mode toggle.</li>
+      <li><strong>Jul 2024:</strong> Advanced search with instant results.</li>
+      <li><strong>Upcoming:</strong> Hat section J at the back of the warehouse.</li>
+    </ul>
+  </div>
+
   <!-- Feedback Form Section (unchanged) -->
   <div class="feedback-section">
     <h3>📢 Suggest a Change / Request New Stock</h3>
@@ -151,7 +214,7 @@
   </div>
 
   <!-- version query added to bust caches -->
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=7"></script>
   <script>
     // Theme bootstrap: restore persisted theme
     (function(){
