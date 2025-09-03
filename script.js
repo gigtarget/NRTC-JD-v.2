@@ -23,6 +23,7 @@ const svg = document.getElementById("aisles");
 const searchBox = document.getElementById("searchBox");
 const clearBtn = document.getElementById("clearBtn");
 const themeBtn = document.getElementById("themeToggle");
+const POPUP_VERSION = "1";
 
 let inventoryData = [];
 let allCodes = [];
@@ -339,6 +340,20 @@ if (themeBtn) {
   });
 }
 
+function initFeaturePopup() {
+  const stored = localStorage.getItem("featurePopupVersion");
+  if (stored === POPUP_VERSION) return;
+  const popup = document.getElementById("feature-popup");
+  const dismiss = document.getElementById("feature-popup-dismiss");
+  if (!popup || !dismiss) return;
+  popup.classList.remove("hidden");
+  dismiss.addEventListener("click", () => {
+    localStorage.setItem("featurePopupVersion", POPUP_VERSION);
+    popup.classList.add("hidden");
+  });
+}
+
 // Init
 drawSections();
 loadInventoryData();
+initFeaturePopup();
