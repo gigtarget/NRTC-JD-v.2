@@ -345,12 +345,18 @@ function initFeaturePopup() {
   if (stored === POPUP_VERSION) return;
   const popup = document.getElementById("feature-popup");
   const dismiss = document.getElementById("feature-popup-dismiss");
+  const close = document.getElementById("feature-popup-close");
   if (!popup || !dismiss) return;
   popup.classList.remove("hidden");
   dismiss.addEventListener("click", () => {
     localStorage.setItem("featurePopupVersion", POPUP_VERSION);
     popup.classList.add("hidden");
   });
+  if (close) {
+    close.addEventListener("click", () => {
+      popup.classList.add("hidden");
+    });
+  }
 }
 
 // Init
