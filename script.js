@@ -58,10 +58,35 @@ async function loadInventoryData() {
       opt.value = c;
       dl.appendChild(opt);
     });
+    
   } catch {
     inventoryData = [];
     allCodes = [];
   }
+}
+
+function updateSuggestions() {
+  const term = searchBox.value.split(/[^A-Z0-9]+/g).pop().toUpperCase();
+  const box = document.getElementById("suggestions");
+  box.innerHTML = "";
+  if (!term) { box.style.display = "none"; return; }
+  const matches = allCodes.filter(code => code.startsWith(term));
+  if (!matches.length) { box.style.display = "none"; return; }
+  matches.slice(0, 10).forEach(code => {
+    const div = document.createElement("div");
+    div.textContent = code;
+    div.addEventListener("mousedown", () => {
+      const raw = searchBox.value;
+      const upperRaw = raw.toUpperCase();
+      const idx = upperRaw.lastIndexOf(term);
+      const prefix = raw.slice(0, idx);
+      searchBox.value = prefix + code;
+      box.style.display = "none";
+      searchItems();
+    });
+    box.appendChild(div);
+  });
+  box.style.display = "block";
 }
 
 // ---- Pulse overlay helpers (visual only) ----
@@ -302,11 +327,29 @@ async function searchItems() {
 searchBox.addEventListener("input", () => {
   if (searchBox.value.trim()) {
     clearBtn.style.display = "inline";
-    searchItems();
   } else {
     clearBtn.style.display = "none";
     clearHighlights();
     document.getElementById("result").innerHTML = "";
+  }
+  updateSuggestions();
+});
+searchBox.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const term = searchBox.value.split(/[^A-Z0-9]+/g).pop().toUpperCase();
+    if (term && !allCodes.includes(term)) {
+      const suggestion = allCodes.find(code => code.startsWith(term));
+      if (suggestion) {
+        const raw = searchBox.value;
+        const upperRaw = raw.toUpperCase();
+        const idx = upperRaw.lastIndexOf(term);
+        const prefix = raw.slice(0, idx);
+        searchBox.value = prefix + suggestion;
+      }
+    }
+    document.getElementById("suggestions").style.display = "none";
+    searchItems();
   }
 });
 searchBox.addEventListener("keydown", e => {
@@ -327,6 +370,14 @@ clearBtn.addEventListener("click", () => {
   clearBtn.style.display = "none";
   clearHighlights();
   document.getElementById("result").innerHTML = "";
+  document.getElementById("suggestions").style.display = "none";
+});
+
+document.addEventListener("click", e => {
+  const wrapper = document.querySelector(".input-wrapper");
+  if (wrapper && !wrapper.contains(e.target)) {
+    document.getElementById("suggestions").style.display = "none";
+  }
 });
 
 // Theme toggle (style-only)
