@@ -179,8 +179,11 @@ function drawSections() {
     jIndex++;
   };
 
-  // Group 1 (A-Left, A-Right, B-Left)
-  [["A",0],["A",1],["B",0]].forEach(([a,s]) => addJSection(colX(a,s)));
+  // Group 1 (J1–J3) placed contiguously
+  {
+    const startX = colX("A", 0);
+    [0, 1, 2].forEach(i => addJSection(startX + i * (sectionSize + padding)));
+  }
 
   // Group 2: Hooping Station block spanning C-left..D-right
   const bigX = colX("C",0);
@@ -203,8 +206,11 @@ function drawSections() {
   hsText.textContent = "Hooping Station";
   svg.appendChild(hsText);
 
-  // Group 3 (E-Left, E-Right, F-Left)
-  [["E",0],["E",1],["F",0]].forEach(([a,s]) => addJSection(colX(a,s)));
+  // Group 3 (J4–J6) placed contiguously
+  {
+    const startX = colX("E", 0);
+    [0, 1, 2].forEach(i => addJSection(startX + i * (sectionSize + padding)));
+  }
 
   // Group 4 (H-Left)
   addJSection(colX("H",0));
