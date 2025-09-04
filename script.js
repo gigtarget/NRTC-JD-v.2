@@ -175,16 +175,7 @@ function drawSections() {
     rect.setAttribute("data-key-short", `J-AfterWalkway-R-${jIndex}`);
     svg.appendChild(rect);
 
-    // numeric labels so sections can be visually identified and searched
-    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    t.setAttribute("x", x + sectionSize / 2);
-    t.setAttribute("y", hoopingStartY + sectionSize / 2);
-    t.setAttribute("class", "section-label");
-    t.setAttribute("text-anchor", "middle");
-    t.setAttribute("dominant-baseline", "middle");
-    t.textContent = `J${jIndex}`;
-    svg.appendChild(t);
-
+    // leave boxes blank (no text labels) like other aisles
     jIndex++;
   };
 
