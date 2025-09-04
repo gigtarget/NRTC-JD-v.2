@@ -319,4 +319,12 @@ ASTH,F,Bottom,After Walkway,Left,9
 ,F,Bottom,After Walkway,Right,7
 ,F,Bottom,After Walkway,Right,8
 ,F,Bottom,After Walkway,Right,9
-TEST,J,Bottom,After Walkway,Right,1
+ABC,J,Top,After Walkway,Right,1
+HATOS,J,Top,After Walkway,Right,2
+HT008,J,Top,After Walkway,Right,2
+HATW,J,Top,After Walkway,Right,3
+HATVT,J,Top,After Walkway,Right,4
+TQ002,J,Top,After Walkway,Right,5
+TQ003,J,Top,After Walkway,Right,5
+TQ004,J,Top,After Walkway,Right,6
+ATWC,J,Top,After Walkway,Right,7
